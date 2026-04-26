@@ -113,4 +113,4 @@ uv run chainlit run src/ariadne/ui/app.py
 Contributions, issues, and feature requests are welcome!
 
 ## License & Acknowledgments
-Developed by [Giorgos Giannopoulos] (https://github.com/GiorgosG1an) as a thesis project for the Department of Informatics and Telecommunications, University of Peloponnese.
+Developed by [Giorgos Giannopoulos](https://github.com/GiorgosG1an) as a thesis project for the Department of Informatics and Telecommunications, University of Peloponnese.
