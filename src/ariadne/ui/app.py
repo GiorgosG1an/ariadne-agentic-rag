@@ -1,8 +1,8 @@
 import chainlit as cl
 from time import perf_counter
 
-from rag_workflow import RAGWorkflow, UIProgressEvent
-from logger_setup import setup_logger, session_context
+from ariadne.agent.workflow import RAGWorkflow, UIProgressEvent
+from ariadne.core.logger import setup_logger, session_context
 
 logger, log_listener = setup_logger()
 

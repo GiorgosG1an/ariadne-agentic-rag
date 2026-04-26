@@ -8,7 +8,7 @@ from redisvl.schema import IndexSchema
 from llama_index.vector_stores.redis import RedisVectorStore
 from llama_index.core.schema import BaseNode
 
-from config import settings
+from ariadne.core.config import settings
 
 logger = logging.getLogger("RAG_Workflow")
 

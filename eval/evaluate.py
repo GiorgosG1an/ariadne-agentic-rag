@@ -3,14 +3,13 @@ import asyncio
 from llama_index.core.evaluation import CorrectnessEvaluator, AnswerRelevancyEvaluator, ContextRelevancyEvaluator, FaithfulnessEvaluator
 from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.core.rate_limiter import TokenBucketRateLimiter
-from llama_index.core.workflow import Context  # Προσθήκη για διαχείριση state
+from llama_index.core.workflow import Context
 
 from google.genai import types
 
-# --- 1. Import το δικό σου RAGWorkflow αντί για το chat_engine ---
-from rag_workflow import RAGWorkflow
-from prompts import CORRECTNESS_EVAL_TEMPLATE, FAITHFULNESS_EVAL_TEMPLATE, CONTEXT_EVAL_TEMPLATE, ANSWER_RELEVANCY_EVAL_TEMPLATE
-from config import settings
+from ariadne.agent.workflow import RAGWorkflow
+from ariadne.agent.prompts import CORRECTNESS_EVAL_TEMPLATE, FAITHFULNESS_EVAL_TEMPLATE, CONTEXT_EVAL_TEMPLATE, ANSWER_RELEVANCY_EVAL_TEMPLATE
+from ariadne.core.config import settings
 
 rate_limiter = TokenBucketRateLimiter(
     requests_per_minute=100,
@@ -80,7 +79,7 @@ async def run_evaluation():
                 # --- 4. Εξαγωγή των Retrieved Contexts μέσα από το Workflow State ---
                 contexts = await ctx.store.get("retrieved_texts", default=[])
 
-                # --- 5. Ασύγχρονη Αξιολόγηση (χρησιμοποιούμε .aevaluate αντί για .evaluate) ---
+                # --- 5. Ασύγχρονη Αξιολόγηση ---
                 correctness_result = await correctness_evaluator.aevaluate(
                     query=query,
                     response=generated_answer,
@@ -150,7 +149,7 @@ async def run_evaluation():
             except Exception as e:
                 error_msg = str(e)
                 if "503" in error_msg or "429" in error_msg or "Unavailable" in error_msg:
-                    wait_time = 30 * (attempt + 1) # Περιμένει 30s, μετά 60s, μετά 90s...
+                    wait_time = 30 * (attempt + 1)
                     print(f" Error (503/429). Attempt: {attempt+1}/{max_retries}. Waiting for {wait_time} seconds...")
                     await asyncio.sleep(wait_time)
                 else:
@@ -158,7 +157,7 @@ async def run_evaluation():
                     break 
         if not success:
             print(f"❌ [ΑΠΟΤΥΧΙΑ] Το ερώτημα {i+1} εγκαταλείφθηκε μετά από {max_retries} προσπάθειες λόγω Google API.")
-        # --- Εκτύπωση Στοιχείων ---
+        
         print(f"\n{'='*70}")
         print(f"Correctness: {correctness_result.score}/5.0 | Passing: {correctness_result.passing}")
         print(f"Σχόλιο: {correctness_result.feedback.strip() if correctness_result.feedback else '-'}")

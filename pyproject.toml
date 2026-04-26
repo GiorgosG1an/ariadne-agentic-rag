@@ -1,7 +1,7 @@
 [project]
 name = "ariadne-agentic-rag"
 version = "0.1.0"
-description = "Add your description here"
+description = "Event-Driven Agentic RAG for DIT UOP"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -30,3 +30,10 @@ dependencies = [
     "redis>=5.3.1",
     "redisvl>=0.4.1",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ariadne"]

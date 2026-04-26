@@ -11,9 +11,9 @@ from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from google.genai import types
 from google.genai.local_tokenizer import LocalTokenizer
 
-from qdrant_setup import get_qdrant_clients
-from config import settings
-from dependencies import gemini_tokenizer
+from ariadne.infrastructure.qdrant import get_qdrant_clients
+from ariadne.core.config import settings
+from ariadne.core.dependencies import gemini_tokenizer
 
 Settings.tokenizer = gemini_tokenizer
 

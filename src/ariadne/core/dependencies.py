@@ -6,7 +6,6 @@ from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.core.indices.vector_store import VectorStoreIndex
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-# from llama_index.vector_stores.redis import RedisVectorStore
 from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.core.vector_stores.types import VectorStoreInfo, MetadataInfo
 from llama_index.core.settings import Settings
@@ -15,7 +14,7 @@ from llama_index.core.rate_limiter import TokenBucketRateLimiter
 from google.genai import types
 from google.genai.local_tokenizer import LocalTokenizer
 
-from config import settings
+from ariadne.core.config import settings
 
 logger = logging.getLogger("RAG_Workflow")
 
@@ -114,7 +113,7 @@ vector_info = VectorStoreInfo(
 @functools.lru_cache(maxsize=1)
 def get_qdrant_index() -> VectorStoreIndex:
     """Lazy loads Qdrant connection and returns the LlamaIndex VectorStoreIndex."""
-    from qdrant_setup import init_qdrant_collection, get_qdrant_clients
+    from ariadne.infrastructure.qdrant import init_qdrant_collection, get_qdrant_clients
     
     logger.info("Initializing Qdrant Vector Store...")
     init_qdrant_collection()
@@ -135,7 +134,7 @@ def get_qdrant_index() -> VectorStoreIndex:
 @functools.lru_cache(maxsize=1)
 def get_semantic_cache():
     """Lazy loads Redis cache. Returns (cache_index, cache_retriever). Gracefully degrades if Redis is down."""
-    from redis_setup import TTLRedisVectorStore, get_redis_clients, cache_schema 
+    from ariadne.infrastructure.redis import TTLRedisVectorStore, get_redis_clients, cache_schema 
     
     logger.info("Initializing Redis Semantic Cache...")
     try:
