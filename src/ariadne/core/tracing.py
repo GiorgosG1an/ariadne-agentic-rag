@@ -1,3 +1,12 @@
+"""
+Tracing and observability for the Ariadne AI assistant.
+
+This file provides utilities for initializing Phoenix tracing and
+instrumenting LlamaIndex with OpenTelemetry.
+
+Author: Georgios Giannopoulos
+"""
+
 import logging
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.trace import TracerProvider
@@ -9,13 +18,13 @@ def init_phoenix_tracing(endpoint: str = "http://localhost:6006/v1/traces") -> N
     Initialize Phoenix tracing for LlamaIndex instrumentation.
 
     Args:
-        - endpoint (str, optional): The OpenTelemetry Protocol (OTLP) endpoint URL
+        endpoint (str, optional): The OpenTelemetry Protocol (OTLP) endpoint URL
             where traces will be sent. Defaults to "http://localhost:6006/v1/traces"
             (Phoenix local development server).
     """
     
     try:
-        tracer_provider = TracerProvider()
+        tracer_provider: TracerProvider = TracerProvider()
         tracer_provider.add_span_processor(SimpleSpanProcessor(OTLPSpanExporter(endpoint)))
         
         LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)

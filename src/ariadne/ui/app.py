@@ -1,5 +1,15 @@
+"""
+Chainlit UI application for Ariadne.
+
+This file defines the UI components and message handling logic for the
+Ariadne AI assistant, using Chainlit to provide a chat interface.
+
+Author: Georgios Giannopoulos
+"""
+
 import chainlit as cl
 from time import perf_counter
+from typing import Optional
 
 from ariadne.agent.workflow import RAGWorkflow, UIProgressEvent
 from ariadne.core.logger import setup_logger, session_context
@@ -7,11 +17,16 @@ from ariadne.core.logger import setup_logger, session_context
 logger, log_listener = setup_logger()
 
 @cl.on_chat_start
-async def on_chat_start():
+async def on_chat_start() -> None:
+    """
+    Initializes the session when a new chat starts.
     
-    session_id = cl.user_session.get("id") or "anonymous_session"
+    Sets up the RAGWorkflow and stores it in the user session.
+    """
 
-    workflow = RAGWorkflow(session_id=session_id, timeout=120)
+    session_id: str = cl.user_session.get("id") or "anonymous_session"
+
+    workflow: RAGWorkflow = RAGWorkflow(session_id=session_id, timeout=120)
 
     cl.user_session.set("workflow", workflow)
     cl.user_session.set("session_id", session_id)
@@ -19,9 +34,18 @@ async def on_chat_start():
     logger.info("New Chainlit session started.", extra={"chainlit_session": session_id})
 
 @cl.on_message
-async def main(message: cl.Message):
-    session_id = cl.user_session.get("session_id")
-    workflow: RAGWorkflow = cl.user_session.get("workflow")
+async def main(message: cl.Message) -> None:
+    """
+    Main message handler for incoming user messages.
+
+    Runs the RAGWorkflow, streams progress events to the UI,
+    and streams the final response.
+
+    Args:
+        message (cl.Message): The message object containing user input.
+    """
+    session_id: str = cl.user_session.get("session_id")
+    workflow: Optional[RAGWorkflow] = cl.user_session.get("workflow")
     if not workflow:
         await cl.Message(content="Session error. Please refresh the page.", author="Ariadne AI Assistant").send()
         return
@@ -29,7 +53,7 @@ async def main(message: cl.Message):
     session_context.set(session_id)
 
     try:
-        start_time = perf_counter()
+        start_time: float = perf_counter()
         logger.info("UI: Received user message", extra={"user_msg": message.content})
 
 
@@ -47,20 +71,20 @@ async def main(message: cl.Message):
                
         response_stream = await handler
         
-        msg = cl.Message(content="", author='Ariadne AI Assistant')
+        msg: cl.Message = cl.Message(content="", author='Ariadne AI Assistant')
         await msg.send()
 
-        first_token_flag = False
+        first_token_flag: bool = False
         async for token in response_stream:
             if not first_token_flag:
-                ttft = perf_counter() - start_time
+                ttft: float = perf_counter() - start_time
                 logger.info("First token generated", extra={"ttft_seconds": round(ttft, 3)})
                 print(f"⏱️ TTFT: {ttft:.3f} seconds")
                 first_token_flag = True
 
             await msg.stream_token(token.delta or "")
         
-        total_time = perf_counter() - start_time
+        total_time: float = perf_counter() - start_time
         logger.info("Response completed", extra={"total_time_seconds": round(total_time, 3)})
         msg.content += f"\n\n*(Χρόνος απόκρισης: {total_time:.2f} δευτερόλεπτα)*"
         await msg.update()
@@ -74,14 +98,16 @@ async def main(message: cl.Message):
         ).send()
 
 @cl.on_chat_end
-def on_chat_end():
-    session_id = cl.user_session.get("session_id")
+def on_chat_end() -> None:
+    """
+    Cleans up resources when a chat session ends.
+    """
+    session_id: str = cl.user_session.get("session_id")
     session_context.set(session_id) # ensure log knows who is disconnecting
-    workflow = cl.user_session.get("workflow")
+    workflow: Optional[RAGWorkflow] = cl.user_session.get("workflow")
 
     if workflow:
         del workflow
     cl.user_session.set("workflow", None)
 
     logger.info("Session disconnected. Resources cleared.")
-    

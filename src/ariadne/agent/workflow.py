@@ -1,5 +1,15 @@
+"""
+Workflow definition for the Ariadne RAG agent.
+
+This file contains the logic for routing, retrieval, evaluation, and synthesis
+of responses using LlamaIndex workflows. It manages the state of the conversation
+and interacts with external services like Qdrant and Redis.
+
+Author: Georgios Giannopoulos
+"""
+
 import asyncio
-from typing import Literal, List, Set, Tuple
+from typing import Literal, List, Set, Tuple, Any, Optional, AsyncGenerator
 
 from llama_index.core.llms import ChatResponseAsyncGen
 from llama_index.core.memory import FactExtractionMemoryBlock, Memory
@@ -53,12 +63,29 @@ class SmartAutoRetriever(VectorIndexAutoRetriever):
     the nodes and the generated `VectorStoreQuerySpec`.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Initializes the SmartAutoRetriever.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         super().__init__(*args, **kwargs)
 
     async def aretrieve_with_spec(
         self, str_or_query_bundle: str | QueryBundle
-    ) -> Tuple[List[NodeWithScore], VectorStoreQuerySpec]:
+    ) -> Tuple[List[NodeWithScore], Optional[VectorStoreQuerySpec]]:
+        """
+        Retrieves nodes and returns them along with the generated query spec.
+
+        Args:
+            str_or_query_bundle (str | QueryBundle): The query string or bundle.
+
+        Returns:
+            Tuple[List[NodeWithScore], Optional[VectorStoreQuerySpec]]: A tuple containing
+                the list of retrieved nodes and the query specification used.
+        """
 
         if isinstance(str_or_query_bundle, str):
             query_bundle = QueryBundle(query_str=str_or_query_bundle)
@@ -76,6 +103,7 @@ class SmartAutoRetriever(VectorIndexAutoRetriever):
 #      Models for Structured output
 # ==========================================
 class RouteDecision(BaseModel):
+    """Model for routing decisions."""
     reasoning: str = Field(
         description="Μια σύντομη εξήγηση (concise rationale) για την απόφαση δρομολόγησης."
     )
@@ -85,6 +113,7 @@ class RouteDecision(BaseModel):
 
 
 class RouteAndCondenseDecision(BaseModel):
+    """Model for routing and query condensation decisions."""
     reasoning: str = Field(
         description="Μια σύντομη εξήγηση (concise rationale) για την απόφαση δρομολόγησης και σύνοψης (contextualization) του ερωτήματος"
     )
@@ -96,6 +125,7 @@ class RouteAndCondenseDecision(BaseModel):
     )
 
 class RelevanceEvaluation(BaseModel):
+    """Model for relevance evaluation of retrieved documents."""
     reasoning: str = Field(
         description="Σύντομη εξήγηση για το αν τα έγγραφα περιέχουν την απάντηση."
     )
@@ -104,6 +134,7 @@ class RelevanceEvaluation(BaseModel):
     )
 
 class RewriteQuery(BaseModel):
+    """Model for query rewriting."""
     reasoning: str = Field(
         description="Σύντομη εξήγηση (concise rationale) για το γιατί η νέα ερώτηση είναι καλύτερη και τι άλλαξε σε σχέση με την παλιά."
     )
@@ -115,26 +146,33 @@ class RewriteQuery(BaseModel):
 #                 Events
 # ==========================================
 class RouteEvent(Event):
+    """Event triggered for routing."""
     query: str
 
 class RetrieveEvent(Event):
+    """Event triggered for document retrieval."""
     query: str
 
 
 class CheckCacheEvent(Event):
+    """Event triggered to check the semantic cache."""
     condensed_query: str
 
 class SynthesizeEvent(Event):
+    """Event triggered for response synthesis using RAG."""
     query: str
     nodes: List[NodeWithScore]
 
 class SynthesizeGeneralEvent(Event):
+    """Event triggered for general conversational synthesis."""
     query: str
 
 class RewriteQueryEvent(Event):
+    """Event triggered for query rewriting."""
     query: str
 
 class SynthesizeFallbackEvent(Event):
+    """Event triggered for fallback synthesis when RAG fails."""
     query: str
 
 class UIProgressEvent(Event):
@@ -147,8 +185,32 @@ class UIProgressEvent(Event):
 #               Workflow
 # ==========================================
 class RAGWorkflow(Workflow):
+    """
+    Main RAG workflow for the Ariadne AI assistant.
 
-    def __init__(self, session_id: str, *args, **kwargs):
+    Attributes:
+        session_id (str): Unique identifier for the current session.
+        llm (Any): The main Large Language Model.
+        lite_llm (Any): A lightweight LLM for intermediate tasks.
+        embed_model (Any): The embedding model for vector search.
+        index (Any): The primary vector index (Qdrant).
+        cache_index (Any): The semantic cache index (Redis).
+        cache_retriever (Any): The retriever for the semantic cache.
+        auto_index_retriever (SmartAutoRetriever): Self-correcting auto-retriever.
+        index_retriever (VectorIndexRetriever): Fallback vector index retriever.
+        memory (Memory): Conversational memory with fact extraction.
+        max_retries (int): Maximum number of retrieval retries.
+    """
+
+    def __init__(self, session_id: str, *args: Any, **kwargs: Any) -> None:
+        """
+        Initializes the RAGWorkflow.
+
+        Args:
+            session_id (str): The session ID.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         super().__init__(*args, **kwargs)
         self.session_id = session_id
 
@@ -206,9 +268,19 @@ class RAGWorkflow(Workflow):
         self,
         raw_stream: ChatResponseAsyncGen,
         role: MessageRole,
-        on_complete_callback=None,
-    ):
-        """DRY helper method to manage streaming response generation and state updates."""
+        on_complete_callback: Optional[Any] = None,
+    ) -> AsyncGenerator[Any, None]:
+        """
+        DRY helper method to manage streaming response generation and state updates.
+
+        Args:
+            raw_stream (ChatResponseAsyncGen): The raw stream from the LLM.
+            role (MessageRole): The role of the speaker (e.g., ASSISTANT).
+            on_complete_callback (Optional[Any]): Optional callback function after completion.
+
+        Yields:
+            Any: Chunks of the generated response.
+        """
         full_response = ""
         async for chunk in raw_stream:
             full_response += chunk.delta or ""
@@ -224,7 +296,16 @@ class RAGWorkflow(Workflow):
 
     @step
     async def initialize_session(self, ctx: Context, ev: StartEvent) -> RouteEvent:
-        """Setup context and history. Pass the raw query to the router."""
+        """
+        Setup context and history. Pass the raw query to the router.
+
+        Args:
+            ctx (Context): The workflow context.
+            ev (StartEvent): The start event containing the user message.
+
+        Returns:
+            RouteEvent: Event to trigger the routing step.
+        """
         # set the context var for logging
         session_context.set(self.session_id)
 
@@ -240,7 +321,16 @@ class RAGWorkflow(Workflow):
     async def route_and_condense_query(
         self, ctx: Context, ev: RouteEvent
     ) -> CheckCacheEvent | SynthesizeGeneralEvent:
-        """Combines routing, history condensation and semantic caching."""
+        """
+        Combines routing, history condensation and semantic caching.
+
+        Args:
+            ctx (Context): The workflow context.
+            ev (RouteEvent): The routing event.
+
+        Returns:
+            CheckCacheEvent | SynthesizeGeneralEvent: Next event based on decision.
+        """
 
         chat_history = await self.memory.aget()
         # conv history without latest message
@@ -291,6 +381,16 @@ class RAGWorkflow(Workflow):
     async def check_semantic_cache(
         self, ctx: Context, ev: CheckCacheEvent
     ) -> RetrieveEvent | StopEvent:
+        """
+        Checks the semantic cache for a pre-existing answer.
+
+        Args:
+            ctx (Context): The workflow context.
+            ev (CheckCacheEvent): The cache check event.
+
+        Returns:
+            RetrieveEvent | StopEvent: RetrieveEvent if cache miss, StopEvent if hit.
+        """
         if self.cache_retriever:
             cache_results = await self.cache_retriever.aretrieve(ev.condensed_query)
 
@@ -324,7 +424,7 @@ class RAGWorkflow(Workflow):
                     def __init__(self, text: str):
                         self.delta = text
 
-                async def cached_response_generator():
+                async def cached_response_generator() -> AsyncGenerator[FakeChunk, None]:
                     for word in cached_answer.split(" "):
                         yield FakeChunk(word + " ")
                         await asyncio.sleep(
@@ -340,7 +440,16 @@ class RAGWorkflow(Workflow):
     async def retrieve_and_evaluate(
         self, ctx: Context, ev: RetrieveEvent
     ) -> SynthesizeEvent | RewriteQueryEvent | SynthesizeFallbackEvent:
-        """Fetch documents, handle fallback retrieval, and filter logic."""
+        """
+        Fetch documents, handle fallback retrieval, and filter logic.
+
+        Args:
+            ctx (Context): The workflow context.
+            ev (RetrieveEvent): The retrieval event.
+
+        Returns:
+            SynthesizeEvent | RewriteQueryEvent | SynthesizeFallbackEvent: Next event based on results.
+        """
 
         ctx.write_event_to_stream(
             UIProgressEvent(
@@ -403,7 +512,16 @@ class RAGWorkflow(Workflow):
     async def _handle_retry(
         self, ctx: Context, query: str
     ) -> RewriteQueryEvent | SynthesizeFallbackEvent:
-        """Helper to manage retry logic state cleanly."""
+        """
+        Helper to manage retry logic state cleanly.
+
+        Args:
+            ctx (Context): The workflow context.
+            query (str): The current query.
+
+        Returns:
+            RewriteQueryEvent | SynthesizeFallbackEvent: Next event based on retry count.
+        """
         current_retries = await ctx.store.get("retries", default=0)
         if current_retries < self.max_retries:
             await ctx.store.set("retries", current_retries + 1)
@@ -412,7 +530,16 @@ class RAGWorkflow(Workflow):
 
     @step
     async def rewrite_query(self, ctx: Context, ev: RewriteQueryEvent) -> RetrieveEvent:
-        """Rewrite query if retrieval failed."""
+        """
+        Rewrite query if retrieval failed.
+
+        Args:
+            ctx (Context): The workflow context.
+            ev (RewriteQueryEvent): The rewrite event.
+
+        Returns:
+            RetrieveEvent: Event to retry retrieval with the new query.
+        """
         rewrite_prompt = PromptTemplate(
             "Το παρακάτω ερώτημα δεν έφερε σωστά αποτελέσματα από τη βάση δεδομένων της Σχολής.\n"
             "Αναδιατύπωσε το ερώτημα ώστε να είναι πιο γενικό, ή χρησιμοποίησε συνώνυμα για καλύτερη αναζήτηση.\n"
@@ -437,7 +564,16 @@ class RAGWorkflow(Workflow):
 
     @step
     async def synthesize(self, ctx: Context, ev: SynthesizeEvent) -> StopEvent:
-        """Final generation using RAG context."""
+        """
+        Final generation using RAG context.
+
+        Args:
+            ctx (Context): The workflow context.
+            ev (SynthesizeEvent): The synthesis event containing nodes.
+
+        Returns:
+            StopEvent: Event marking the end of the workflow with the response stream.
+        """
         ctx.write_event_to_stream(
             UIProgressEvent(
                 step_name="Σύνθεση απάντησης", msg="Γίνεται σύνθεση της απάντησης."
@@ -456,7 +592,7 @@ class RAGWorkflow(Workflow):
         messages = [sys_message] + chat_history
         raw_response_stream = await self.llm.astream_chat(messages)
 
-        async def cache_callback(full_response: str):
+        async def cache_callback(full_response: str) -> None:
             """Callback to save to Semantic Cache if criteria are met."""
             is_standalone = len(chat_history) <= 2
             top_node_score = await ctx.store.get("top_node_score", default=0)
@@ -498,7 +634,16 @@ class RAGWorkflow(Workflow):
     async def synthesize_general(
         self, ctx: Context, ev: SynthesizeGeneralEvent
     ) -> StopEvent:
-        """General conversational generation."""
+        """
+        General conversational generation.
+
+        Args:
+            ctx (Context): The workflow context.
+            ev (SynthesizeGeneralEvent): The general synthesis event.
+
+        Returns:
+            StopEvent: Event marking the end of the workflow with the response stream.
+        """
 
         await ctx.store.set("retrieved_texts", [])
         sys_message = ChatMessage(
@@ -520,7 +665,16 @@ class RAGWorkflow(Workflow):
     async def synthesize_fallback(
         self, ctx: Context, ev: SynthesizeFallbackEvent
     ) -> StopEvent:
-        """Apologetic response when RAG completely fails."""
+        """
+        Apologetic response when RAG completely fails.
+
+        Args:
+            ctx (Context): The workflow context.
+            ev (SynthesizeFallbackEvent): The fallback synthesis event.
+
+        Returns:
+            StopEvent: Event marking the end of the workflow with the response stream.
+        """
 
         await ctx.store.set("retrieved_texts", [])
         sys_message = ChatMessage(
@@ -537,7 +691,8 @@ class RAGWorkflow(Workflow):
         return StopEvent(result=stream_gen)
 
 
-async def draw_workflow():
+async def draw_workflow() -> None:
+    """Generates visualization files for the workflow."""
 
     workflow = RAGWorkflow(session_id="test", timeout=120)
 
