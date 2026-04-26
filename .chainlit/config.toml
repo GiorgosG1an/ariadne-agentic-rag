@@ -173,7 +173,7 @@ avatar_size = 64
     name = "Αναφορά Προβλήματος"
     display_name = "Αναφορά Προβλήματος"
     icon_url = "https://img.icons8.com/external-tal-revivo-bold-tal-revivo/48/1A1A1A/external-github-community-for-software-building-and-testing-online-logo-bold-tal-revivo.png"
-    url = "https://github.com/GiorgosG1an/ariadne-agentic-rag/issues"
+    url = "https://github.com/GiorgosG1an/ariadne-agentic-rag/issues/new/choose"
     target = "_blank"  # Optional: "_self", "_parent", "_top".
 
 [meta]
