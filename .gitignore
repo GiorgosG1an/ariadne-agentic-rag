@@ -245,3 +245,5 @@ schedule_data/
 courses/
 md/
 pdfs/
+.vscode/
+.chainlit/translations/
