@@ -72,7 +72,6 @@ class SmartAutoRetriever(VectorIndexAutoRetriever):
 
         return nodes, spec
 
-
 # ==========================================
 #      Models for Structured output
 # ==========================================
@@ -96,7 +95,6 @@ class RouteAndCondenseDecision(BaseModel):
         description="If 'rag', rewrite the query using conversation history to make it standalone. If 'general', leave as is."
     )
 
-
 class RelevanceEvaluation(BaseModel):
     reasoning: str = Field(
         description="Σύντομη εξήγηση για το αν τα έγγραφα περιέχουν την απάντηση."
@@ -104,7 +102,6 @@ class RelevanceEvaluation(BaseModel):
     is_relevant: bool = Field(
         description="True αν τα έγγραφα μπορούν να απαντήσουν την ερώτηση, αλλιώς False."
     )
-
 
 class RewriteQuery(BaseModel):
     reasoning: str = Field(
@@ -114,13 +111,11 @@ class RewriteQuery(BaseModel):
         description="Η νέα, αναδιατυπωμένη ερώτηση. Πρέπει να είναι γενική, καθαρή και να χρησιμοποιεί συνώνυμα."
     )
 
-
 # ==========================================
 #                 Events
 # ==========================================
 class RouteEvent(Event):
     query: str
-
 
 class RetrieveEvent(Event):
     query: str
@@ -129,30 +124,24 @@ class RetrieveEvent(Event):
 class CheckCacheEvent(Event):
     condensed_query: str
 
-
 class SynthesizeEvent(Event):
     query: str
     nodes: List[NodeWithScore]
 
-
 class SynthesizeGeneralEvent(Event):
     query: str
-
 
 class RewriteQueryEvent(Event):
     query: str
 
-
 class SynthesizeFallbackEvent(Event):
     query: str
-
 
 class UIProgressEvent(Event):
     """Event that emits the processing event of the workflow to the UI"""
 
     step_name: str = Field(description="The current step of the workflow.")
     msg: str = Field(description="Message to show to the UI.")
-
 
 # ==========================================
 #               Workflow
@@ -358,9 +347,16 @@ class RAGWorkflow(Workflow):
                 step_name="Αναζήτηση", msg=f"Ανάκτηση από τα έγγραφα του τμήματος"
             )
         )
+        # GEMINI EMBEDDING 2 PREFIX 
+        # https://ai.google.dev/gemini-api/docs/embeddings#task-types-embeddings-2
+        gemini_search_str = f"task: question answering | query: {ev.query}"
 
+        query_bundle = QueryBundle(
+            query_str=ev.query,
+            custom_embedding_strs=[gemini_search_str] # use the prefixed query for embedding the query
+        )
         # Try Auto Retriever
-        nodes, spec = await self.auto_index_retriever.aretrieve_with_spec(ev.query)
+        nodes, spec = await self.auto_index_retriever.aretrieve_with_spec(query_bundle)
 
         # Try Fallback Retriever if Auto failed
         if not nodes:
