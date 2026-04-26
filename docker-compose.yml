@@ -1,0 +1,81 @@
+name: ariadne-agentic-rag-stack
+
+# Custom Network for Stack
+networks:
+  ariadne_net:
+    driver: bridge
+
+# Ασφαλής αποθήκευση δεδομένων (Persisting)
+volumes:
+  qdrant_data:
+  redis_data:
+
+# Log Rotation 
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # ==========================================
+  # Qdrant: Vector Database (Hybrid Search)
+  # ==========================================
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ariadne_qdrant
+    ports:
+      - "6333:6333" # REST API
+      - "6334:6334" # gRPC
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - ariadne_net
+    restart: unless-stopped
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # Redis: Semantic Caching 
+  # ==========================================
+  redis:
+    image: redis/redis-stack:latest
+    container_name: ariadne_redis
+    ports:
+      - "6379:6379" # Redis DB Port
+      - "8001:8001" # RedisInsight UI Port
+    volumes:
+      - redis_data:/data
+    networks:
+      - ariadne_net
+    restart: unless-stopped
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # Arize Phoenix: LLM Observability & Tracing
+  # ==========================================
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    container_name: ariadne_phoenix
+    ports:
+      - "6006:6006" # UI
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    networks:
+      - ariadne_net
+    restart: unless-stopped
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6006/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
