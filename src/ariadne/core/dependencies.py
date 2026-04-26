@@ -1,6 +1,15 @@
+"""
+Dependency injection and global components for Ariadne.
+
+This file initializes and provides access to shared components such as
+LLM instances, embedding models, vector store indices, and caching retrievers.
+
+Author: Georgios Giannopoulos
+"""
+
 import functools
 import logging
-from typing import List
+from typing import List, Tuple, Any, Optional
 
 from llama_index.llms.google_genai import GoogleGenAI
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
@@ -16,17 +25,17 @@ from google.genai.local_tokenizer import LocalTokenizer
 
 from ariadne.core.config import settings
 
-logger = logging.getLogger("RAG_Workflow")
+logger: logging.Logger = logging.getLogger("RAG_Workflow")
 
 
 # --- Rate Limiter ---
-rate_limiter = TokenBucketRateLimiter(
+rate_limiter: TokenBucketRateLimiter = TokenBucketRateLimiter(
     requests_per_minute=100,
     tokens_per_minute=500000
 )
 # --- Models ---
 # main llm for the final answer
-llm = GoogleGenAI(
+llm: GoogleGenAI = GoogleGenAI(
     model=settings.llm_model,
     api_key=settings.google_api_key,
     temperature=0.1, # default temp, as proposed by gemini api 
@@ -36,20 +45,20 @@ llm = GoogleGenAI(
     rate_limiter=rate_limiter,
 )
 # Lightweight model for routing, condense questions
-lite_llm = GoogleGenAI(
+lite_llm: GoogleGenAI = GoogleGenAI(
     model=settings.lite_llm_model,
     api_key=settings.google_api_key,
     temperature=0.1,
 )
 # same as above but without token restriction, used for fact memory block
-fact_llm = GoogleGenAI(
+fact_llm: GoogleGenAI = GoogleGenAI(
     model=settings.lite_llm_model,
     api_key=settings.google_api_key,
     temperature=0.2,
 )
 
 # Embed model for retrieving
-embed_model = GoogleGenAIEmbedding(
+embed_model: GoogleGenAIEmbedding = GoogleGenAIEmbedding(
     model_name=settings.embed_model,
     api_key=settings.google_api_key,
     embedding_config=types.EmbedContentConfig(
@@ -58,10 +67,17 @@ embed_model = GoogleGenAIEmbedding(
 )
 
 # Tokenizer for counting tokens
-local_tokenizer = LocalTokenizer(model_name=settings.llm_model)
-def gemini_tokenizer(text: str) -> List[bytes] | List:
+local_tokenizer: LocalTokenizer = LocalTokenizer(model_name=settings.llm_model)
+
+def gemini_tokenizer(text: str) -> List[bytes] | List[Any]:
     """
     Tokenizes text using Google Gemini's local tokenizer.
+
+    Args:
+        text (str): The text to tokenize.
+
+    Returns:
+        List[bytes] | List[Any]: A list of tokens or bytes representing the text.
     """
     if not text:
         return []
@@ -78,7 +94,7 @@ Settings.llm = llm
 Settings.embed_model = embed_model
 Settings.tokenizer = gemini_tokenizer
 
-vector_info = VectorStoreInfo(
+vector_info: VectorStoreInfo = VectorStoreInfo(
     content_info="Course descriptions from University of Peloponnese. Semester the course is offered and category it belongs based on the official course guide.",
     metadata_info=[
         MetadataInfo(
@@ -111,14 +127,19 @@ vector_info = VectorStoreInfo(
 # --- Qdrant ---
 @functools.lru_cache(maxsize=1)
 def get_qdrant_index() -> VectorStoreIndex:
-    """Lazy loads Qdrant connection and returns the LlamaIndex VectorStoreIndex."""
+    """
+    Lazy loads Qdrant connection and returns the LlamaIndex VectorStoreIndex.
+
+    Returns:
+        VectorStoreIndex: The initialized Qdrant vector store index.
+    """
     from ariadne.infrastructure.qdrant import init_qdrant_collection, get_qdrant_clients
     
     logger.info("Initializing Qdrant Vector Store...")
     init_qdrant_collection()
     client, aclient = get_qdrant_clients()
     
-    qdrant_vector_store = QdrantVectorStore(
+    qdrant_vector_store: QdrantVectorStore = QdrantVectorStore(
         client=client,
         aclient=aclient,
         collection_name=settings.qdrant_collection,
@@ -131,8 +152,15 @@ def get_qdrant_index() -> VectorStoreIndex:
 
 # --- Redis ---
 @functools.lru_cache(maxsize=1)
-def get_semantic_cache():
-    """Lazy loads Redis cache. Returns (cache_index, cache_retriever). Gracefully degrades if Redis is down."""
+def get_semantic_cache() -> Tuple[Optional[VectorStoreIndex], Optional[VectorIndexRetriever]]:
+    """
+    Lazy loads Redis cache.
+
+    Returns:
+        Tuple[Optional[VectorStoreIndex], Optional[VectorIndexRetriever]]:
+            A tuple containing the (cache_index, cache_retriever).
+            Gracefully returns (None, None) if Redis is down.
+    """
     from ariadne.infrastructure.redis import TTLRedisVectorStore, get_redis_clients, cache_schema 
     
     logger.info("Initializing Redis Semantic Cache...")
@@ -141,7 +169,7 @@ def get_semantic_cache():
         # Ping test to ensure it's actually alive before committing
         client.ping()
         
-        cache_store = TTLRedisVectorStore(
+        cache_store: TTLRedisVectorStore = TTLRedisVectorStore(
             schema=cache_schema, 
             redis_client=client, 
             redis_aclient=aclient, 
@@ -149,12 +177,12 @@ def get_semantic_cache():
             ttl=settings.cache_ttl_seconds,
         )
 
-        cache_index = VectorStoreIndex.from_vector_store(
+        cache_index: VectorStoreIndex = VectorStoreIndex.from_vector_store(
             vector_store=cache_store, 
             embed_model=embed_model,
         )
 
-        cache_retriever = VectorIndexRetriever(
+        cache_retriever: VectorIndexRetriever = VectorIndexRetriever(
             index=cache_index,
             similarity_top_k=1,
             embed_model=embed_model,
@@ -164,4 +192,3 @@ def get_semantic_cache():
     except Exception as e:
         logger.warning(f"Failed to connect to Redis. Semantic Cache is disabled. Error: {e}")
         return None, None
-    

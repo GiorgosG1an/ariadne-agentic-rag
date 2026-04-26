@@ -1,19 +1,41 @@
+"""
+Qdrant vector store infrastructure for Ariadne.
+
+This file manages the connection to the Qdrant database and provides
+utilities for initializing collections and payload indexes.
+
+Author: Georgios Giannopoulos
+"""
+
 import logging
+from typing import Tuple
 from qdrant_client import QdrantClient, AsyncQdrantClient, models
 from ariadne.core.config import settings
 
-logger = logging.getLogger("RAG_Workflow")
+logger: logging.Logger = logging.getLogger("RAG_Workflow")
 
-def get_qdrant_clients():
-    """Returns synchronous and asynchronous Qdrant clients."""
-    client = QdrantClient(host=settings.qdrant_host, port=settings.qdrant_port)
-    aclient = AsyncQdrantClient(host=settings.qdrant_host, port=settings.qdrant_port)
+def get_qdrant_clients() -> Tuple[QdrantClient, AsyncQdrantClient]:
+    """
+    Returns synchronous and asynchronous Qdrant clients.
+
+    Returns:
+        Tuple[QdrantClient, AsyncQdrantClient]: A tuple containing the
+            synchronous client and the asynchronous client.
+    """
+    client: QdrantClient = QdrantClient(host=settings.qdrant_host, port=settings.qdrant_port)
+    aclient: AsyncQdrantClient = AsyncQdrantClient(host=settings.qdrant_host, port=settings.qdrant_port)
 
     return client, aclient
 
 
-def init_qdrant_collection():
-    """Ensures the collection and payload indexes exist before querying."""
+def init_qdrant_collection() -> None:
+    """
+    Ensures the collection and payload indexes exist before querying.
+
+    Creates the collection with appropriate vector and quantization
+    configurations if it does not already exist. Also sets up payload
+    indexes for filtering.
+    """
     client, _ = get_qdrant_clients()
     
     if not client.collection_exists(settings.qdrant_collection):
