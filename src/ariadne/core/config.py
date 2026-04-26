@@ -7,7 +7,7 @@ class AppSettings(BaseSettings):
     # Models
     llm_model: str = "gemini-2.5-flash" #  gemini-3.1-flash-lite-preview
     lite_llm_model: str = "gemini-2.5-flash-lite"
-    embed_model: str = "gemini-embedding-2-preview"
+    embed_model: str = "gemini-embedding-2"
 
     # RAG parameters
     hybrid_search_alpha: float = 0.7
