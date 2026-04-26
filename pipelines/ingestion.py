@@ -1,4 +1,5 @@
 import json
+from time import time
 from typing import List
 import frontmatter
 from pathlib import Path
@@ -9,7 +10,6 @@ from llama_index.core.node_parser import MarkdownNodeParser, SentenceSplitter
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 
 from google.genai import types
-from google.genai.local_tokenizer import LocalTokenizer
 
 from ariadne.infrastructure.qdrant import get_qdrant_clients
 from ariadne.core.config import settings
@@ -21,8 +21,8 @@ print(f"Setting up embedding model: {settings.embed_model}")
 Settings.embed_model = GoogleGenAIEmbedding(
     model_name=settings.embed_model,
     api_key=settings.google_api_key,
-    embedding_config=types.EmbedContentConfig(
-        task_type="RETRIEVAL_DOCUMENT", output_dimensionality=3072
+    embedding_config=types.EmbedContentConfig( 
+        output_dimensionality=3072,
     ),
     embed_batch_size=100,
 )
@@ -45,7 +45,7 @@ def get_vector_store():
 
 def ingest_courses() -> List[Document]:
     documents = []
-    courses_folder = Path("courses")
+    courses_folder = Path("data/courses")
     for course in courses_folder.glob("*.md"):
         post = frontmatter.load(course)
 
@@ -64,7 +64,12 @@ def ingest_courses() -> List[Document]:
             metadata=metadata,
             metadata_separator="\n",
             metadata_template="{key}: {value}",
-            text_template="--- ΠΛΗΡΟΦΟΡΙΕΣ ΜΑΘΗΜΑΤΟΣ ---\n{metadata_str}\n\n--- ΑΝΑΛΥΤΙΚΟ ΠΕΡΙΕΧΟΜΕΝΟ ---\n{content}",
+            # formated as defined in official Gemini API 
+            # https://ai.google.dev/gemini-api/docs/embeddings#task-types-embeddings-2
+            text_template=(                       
+                f"title: {course.name} | text: ΠΛΗΡΟΦΟΡΙΕΣ ΜΑΘΗΜΑΤΟΣ \n{{metadata_str}}\n\n"
+                f"--- ΑΝΑΛΥΤΙΚΟ ΠΕΡΙΕΧΟΜΕΝΟ ---\n{{content}}"
+            ),
             excluded_embed_metadata_keys=[
                 "url",
                 "file_name",
@@ -82,11 +87,11 @@ def ingest_courses() -> List[Document]:
 
 def ingest_general_markdown_files() -> List[Document]:
     documents = []
-    md_folder = Path("md")
+    md_folder = Path("data/md_general")
 
     for md_file in md_folder.glob("*.md"):
         post = frontmatter.load(md_file)
-
+        title_val = post.metadata.get("title", md_file.stem.replace("_", " "))
         document = Document(
             id_=f"doc_{md_file.stem}",
             text=post.content,
@@ -96,7 +101,11 @@ def ingest_general_markdown_files() -> List[Document]:
             },
             metadata_separator="\n",
             metadata_template="{key}: {value}",
-            text_template="Metadata:\n{metadata_str}\n\nContent:\n{content}",
+            # formated as defined in official Gemini API 
+            # https://ai.google.dev/gemini-api/docs/embeddings#task-types-embeddings-2
+            text_template=(
+                f"title: {title_val} | text: Metadata:\n{{metadata_str}}\n\nContent:\n{{content}}"
+            ),
             excluded_embed_metadata_keys=["year", "file_name", "description"],
         )
 
@@ -107,7 +116,7 @@ def ingest_general_markdown_files() -> List[Document]:
 
 def ingest_website() -> List[Document]:
     documents = []
-    json_file = Path("website_data/dit_website_enriched.jsonl")
+    json_file = Path("data/website_data/dit_website_enriched.jsonl")
     
     if not json_file.exists():
         print(f"File {json_file} does not exist.")
@@ -140,7 +149,12 @@ def ingest_website() -> List[Document]:
                 metadata=metadata,
                 metadata_separator="\n",
                 metadata_template="{key}: {value}",
-                text_template="--- ΙΣΤΟΣΕΛΙΔΑ ΤΜΗΜΑΤΟΣ ---\nΜΕΤΑΔΕΔΟΜΕΝΑ:\n{metadata_str}\n\nΚΕΙΜΕΝΟ:\n{content}",
+                # formated as defined in official Gemini API 
+                # https://ai.google.dev/gemini-api/docs/embeddings#task-types-embeddings-2
+                text_template=(
+                    f"title: {data.get('title', 'Ιστοσελίδα Τμήματος')} | text: "
+                    f"--- ΙΣΤΟΣΕΛΙΔΑ ΤΜΗΜΑΤΟΣ ---\nΜΕΤΑΔΕΔΟΜΕΝΑ:\n{{metadata_str}}\n\nΚΕΙΜΕΝΟ:\n{{content}}"
+                ),
                 excluded_embed_metadata_keys=['url', 'last_modified', 'category'],
                 excluded_llm_metadata_keys=['keywords']
             )
@@ -152,7 +166,7 @@ def ingest_website() -> List[Document]:
 
 def ingest_announcements() -> List[Document]:
     documents = []
-    json_file = Path("website_data/dit_announcements.jsonl")
+    json_file = Path("data/website_data/dit_announcements.jsonl")
 
     if not json_file.exists():
         print(
@@ -184,7 +198,11 @@ def ingest_announcements() -> List[Document]:
                 metadata=metadata,
                 metadata_separator="\n",
                 metadata_template="{key}: {value}",
-                text_template="{content}",  # no need to inject metadata, they are on content too.
+                # formated as defined in official Gemini API 
+                # https://ai.google.dev/gemini-api/docs/embeddings#task-types-embeddings-2
+                text_template=(
+                    f"title: Ανακοίνωση {data.get('title', '')} | text: {{content}}"
+                ),  # no need to inject metadata, they are on content too.
                 excluded_embed_metadata_keys=[
                     "url",
                     "content_category",
@@ -199,7 +217,7 @@ def ingest_announcements() -> List[Document]:
 
 def ingest_schedule() -> List[Document]:
     documents = []
-    json_file = Path("schedule_data/dit_program_cleaned.jsonl")
+    json_file = Path("data/schedule_data/dit_program_spring_2025-26_v2_2.jsonl")
 
     if not json_file.exists():
         print(f"⚠️ Το αρχείο {json_file} δεν υπάρχει.")
@@ -231,7 +249,11 @@ def ingest_schedule() -> List[Document]:
                 metadata=metadata,
                 metadata_separator='\n',
                 metadata_template="{key}: {value}",
-                text_template="{content}",
+                # formated as defined in official Gemini API 
+                # https://ai.google.dev/gemini-api/docs/embeddings#task-types-embeddings-2
+                text_template=(
+                    f"title: Πρόγραμμα - {data['course_name']} | text: {{content}}"
+                ),
                 excluded_embed_metadata_keys=list(metadata.keys()),
                 excluded_llm_metadata_keys=[]
             )
@@ -243,15 +265,6 @@ def ingest_schedule() -> List[Document]:
 
 
 def run_ingestion():
-    Settings.tokenizer = gemini_tokenizer
-    Settings.embed_model = GoogleGenAIEmbedding(
-        model_name=settings.embed_model,
-        api_key=settings.google_api_key,
-        embedding_config=types.EmbedContentConfig(
-            task_type="RETRIEVAL_DOCUMENT", output_dimensionality=3072
-        ),
-        embed_batch_size=100,
-    )
 
     print("Setting up Qdrant vector database...")
     vector_store = get_vector_store()
@@ -273,7 +286,7 @@ def run_ingestion():
 
     if choice in ["1", "6"]:
         courses = ingest_courses()
-        course_parser = SentenceSplitter(chunk_size=8192, chunk_overlap=200, paragraph_separator='\n\n', tokenizer=gemini_tokenizer)
+        course_parser = SentenceSplitter(chunk_size=7000, chunk_overlap=200, paragraph_separator='\n\n', tokenizer=gemini_tokenizer)
         all_nodes.extend(
             course_parser.get_nodes_from_documents(courses, show_progress=True)
         )
@@ -316,13 +329,59 @@ def run_ingestion():
     if confirm.lower() == "y":
         print("\n⏳ Generating dense & sparse embeddings and indexing into Qdrant...")
         storage_context = StorageContext.from_defaults(vector_store=vector_store)
+        valid_nodes =[]
+        for node in all_nodes:
+            if node.get_content() and len(node.get_content().strip()) > 5:
+                valid_nodes.append(node)   
 
-        VectorStoreIndex(
-            nodes=all_nodes,
+        index = VectorStoreIndex(
+            nodes=[],
             embed_model=Settings.embed_model,
             storage_context=storage_context,
             show_progress=True,
         )
+        import time # Πρόσθεσέ το στα imports πάνω πάνω
+
+        print("\n⏳ Ξεκινάει το ασφαλές Ingestion (Node by Node με Retry)...")
+        successful_nodes = 0
+        failed_nodes = 0
+        
+        for i, node in enumerate(valid_nodes):
+            max_retries = 3 # Θα δοκιμάσει μέχρι 3 φορές
+            success = False
+            
+            for attempt in range(max_retries):
+                try:
+                    index.insert_nodes([node])
+                    success = True
+                    break 
+                    
+                except Exception as e:
+                    error_msg = str(e).lower()
+                    
+                    # Αν είναι timeout ή 503 (server overloaded)
+                    if "timed out" in error_msg or "503" in error_msg or "500" in error_msg:
+                        if attempt < max_retries - 1:
+                            print(f"⏳ Timeout στο node, επανάληψη ({attempt + 1}/{max_retries}) σε 2 δευτ...")
+                            time.sleep(2)
+                        else:
+                            print(f"❌ Οριστική αποτυχία μετά από {max_retries} προσπάθειες. Σφάλμα: {e}")
+                    else:
+                        print(f"⚠️ Προσπεράστηκε προβληματικό node {node.get_content()} \nΣφάλμα: {e}")
+                        break 
+            
+            if success:
+                successful_nodes += 1
+                if successful_nodes % 20 == 0:
+                    print(f"✅ Ενσωματώθηκαν επιτυχώς {successful_nodes}/{len(valid_nodes)} nodes...")
+            else:
+                failed_nodes += 1
+
+        print("\n" + "=" * 50)
+        print("🎉 Ingestion Completed!")
+        print(f"Επιτυχίες: {successful_nodes}")
+        print(f"Αποτυχίες: {failed_nodes}")
+        print("=" * 50)
         print("Ingestion completed successfully!")
     else:
         print("Ακύρωση.")
