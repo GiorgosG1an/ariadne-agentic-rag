@@ -232,7 +232,7 @@ __marimo__/
 *.vsix
 
 # Data & Logs
-data/
+# data/
 *.log
 logs/
 eval_results/
@@ -240,10 +240,5 @@ eval_results/
 # Vector DBs / Caches
 qdrant_data/
 redis_data/
-website_data/
-schedule_data/
-courses/
-md/
-pdfs/
 .vscode/
 .chainlit/translations/
