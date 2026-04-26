@@ -53,7 +53,6 @@ embed_model = GoogleGenAIEmbedding(
     model_name=settings.embed_model,
     api_key=settings.google_api_key,
     embedding_config=types.EmbedContentConfig(
-        task_type='QUESTION_ANSWERING',
         output_dimensionality=3072,
     ),
 )
