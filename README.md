@@ -5,7 +5,7 @@
 [![LLM](https://img.shields.io/badge/Gemini-2.5_Flash-orange)](https://deepmind.google/technologies/gemini/)
 [![Vector DB](https://img.shields.io/badge/Qdrant-Hybrid_Search-red)](https://qdrant.tech/)
 [![Cache](https://img.shields.io/badge/Redis-Semantic_Cache-dc382d)](https://redis.io/)
-[![Package Manager](https://img.shields.io/badge/uv-fast-purple)](https://github.com/astral-sh/uv)
+[![Package Manager](https://img.shields.io/badge/uv-fast-yellow)](https://github.com/astral-sh/uv)
 
 **Ariadne** is an advanced, Event-Driven Agentic Retrieval-Augmented Generation (RAG) system aiming to serve as the official AI Academic Advisor for the **Department of Informatics and Telecommunications (DIT) at the University of Peloponnese**. 
 
