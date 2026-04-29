@@ -47,7 +47,7 @@ async def main(message: cl.Message) -> None:
     session_id: str = cl.user_session.get("session_id")
     workflow: Optional[RAGWorkflow] = cl.user_session.get("workflow")
     if not workflow:
-        await cl.Message(content="Session error. Please refresh the page.", author="Ariadne AI Assistant").send()
+        await cl.Message(content="Session error. Please refresh the page.", author="Ariadne").send()
         return
     
     session_context.set(session_id)
@@ -59,19 +59,19 @@ async def main(message: cl.Message) -> None:
 
         handler = workflow.run(user_msg=message.content)
 
-        async with cl.Step(name='Agent Reasoning', type='run') as parent_step:
+        async with cl.Step(name='Ροή Εργασίας', type='run') as parent_step:
             async for event in handler.stream_events():
                 if isinstance(event, UIProgressEvent):
                     async with cl.Step(name=event.step_name, type='tool', parent_id=parent_step.id) as child_step:
                         child_step.output = event.msg
                         await child_step.send()
 
-            parent_step.name='Ολοκληρώθηκε η απάντηση'      
+            parent_step.name='η Ροή Εργασίας'      
             await parent_step.update()
                
         response_stream = await handler
         
-        msg: cl.Message = cl.Message(content="", author='Ariadne AI Assistant')
+        msg: cl.Message = cl.Message(content="", author='Ariadne')
         await msg.send()
 
         first_token_flag: bool = False
@@ -79,14 +79,13 @@ async def main(message: cl.Message) -> None:
             if not first_token_flag:
                 ttft: float = perf_counter() - start_time
                 logger.info("First token generated", extra={"ttft_seconds": round(ttft, 3)})
-                print(f"⏱️ TTFT: {ttft:.3f} seconds")
                 first_token_flag = True
 
             await msg.stream_token(token.delta or "")
         
         total_time: float = perf_counter() - start_time
         logger.info("Response completed", extra={"total_time_seconds": round(total_time, 3)})
-        msg.content += f"\n\n*(Χρόνος απόκρισης: {total_time:.2f} δευτερόλεπτα)*"
+        # msg.content += f"\n\n*(Χρόνος απόκρισης: {total_time:.2f} δευτερόλεπτα)*"
         await msg.update()
 
     except Exception as e:
@@ -94,7 +93,7 @@ async def main(message: cl.Message) -> None:
 
         await cl.Message(
             content="Προέκυψε ένα σφάλμα κατά την επεξεργασία. Παρακαλώ δοκιμάστε ξανά.", 
-            author='Ariadne AI Assistant'
+            author='Ariadne'
         ).send()
 
 @cl.on_chat_end
@@ -110,4 +109,4 @@ def on_chat_end() -> None:
         del workflow
     cl.user_session.set("workflow", None)
 
-    logger.info("Session disconnected. Resources cleared.")
+    logger.info("Session disconnected. Resources cleared.", extra={"chainlit_session": session_id})
