@@ -1,7 +1,7 @@
 # Ariadne (Αριάδνη) - Agentic RAG Academic Advisor
 
 [![Python Version](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
-[![Framework](https://img.shields.io/badge/LlamaIndex-Workflows-black)](https://www.llamaindex.ai/)
+[![Framework](https://img.shields.io/badge/LlamaIndex-Workflows-purple)](https://www.llamaindex.ai/workflows)
 [![LLM](https://img.shields.io/badge/Gemini-2.5_Flash-orange)](https://deepmind.google/technologies/gemini/)
 [![Vector DB](https://img.shields.io/badge/Qdrant-Hybrid_Search-red)](https://qdrant.tech/)
 [![Cache](https://img.shields.io/badge/Redis-Semantic_Cache-dc382d)](https://redis.io/)
