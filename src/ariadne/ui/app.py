@@ -67,14 +67,14 @@ async def main(message: cl.Message) -> None:
 
         handler = workflow.run(user_msg=message.content)
 
-        async with cl.Step(name='Ροή Εργασίας', type='run') as parent_step:
+        async with cl.Step(name='H Αριάδνη σκέφτεται...', type='run') as parent_step:
             async for event in handler.stream_events():
                 if isinstance(event, UIProgressEvent):
                     async with cl.Step(name=event.step_name, type='tool', parent_id=parent_step.id) as child_step:
                         child_step.output = event.msg
                         await child_step.send()
 
-            parent_step.name='η Ροή Εργασίας'      
+            parent_step.name='Σκέψεις Αριάδνης'      
             await parent_step.update()
                
         response_stream = await handler
