@@ -11,7 +11,7 @@ Author: Georgios Giannopoulos
 import asyncio
 from typing import Literal, List, Set, Tuple, Any, Optional, AsyncGenerator
 
-from llama_index.core.llms import ChatResponseAsyncGen
+from llama_index.core.llms import ChatResponse, ChatResponseAsyncGen
 from llama_index.core.memory import FactExtractionMemoryBlock, Memory
 from llama_index.core.prompts import ChatMessage, MessageRole, PromptTemplate
 from llama_index.core.retrievers import VectorIndexAutoRetriever, VectorIndexRetriever
@@ -55,7 +55,6 @@ from ariadne.core.tracing import init_phoenix_tracing
 
 init_phoenix_tracing()
 logger, log_listener = setup_logger()
-
 
 class SmartAutoRetriever(VectorIndexAutoRetriever):
     """
@@ -122,8 +121,6 @@ class RouteDecision(BaseModel):
     route: Literal["rag", "general"] = Field(
         description="Επίλεξε 'rag' αν το ερώτημα αφορά το πανεπιστήμιο, τα μαθήματα, τον οδηγό σπουδών, ανακοινώσεις, επικοινωνία με διδάσκοντες. Επίλεξε 'general' για χαιρετισμούς, άσχετες ερωτήσεις ή small talk."
     )
-
-
 class RouteAndCondenseDecision(BaseModel):
     """Model for routing and query condensation decisions."""
     reasoning: str = Field(
@@ -164,7 +161,6 @@ class RouteEvent(Event):
 class RetrieveEvent(Event):
     """Event triggered for document retrieval."""
     query: str
-
 
 class CheckCacheEvent(Event):
     """Event triggered to check the semantic cache."""
@@ -302,6 +298,32 @@ class RAGWorkflow(Workflow):
         if on_complete_callback:
             await on_complete_callback(full_response)
 
+    async def _generate_cached_stream(self, cached_answered: str) -> ChatResponseAsyncGen:
+        """
+        Generates a simulated stream from a cached answer for consistent UI experience.
+
+        Args:
+            cached_answer (str): The full answer from the cache.
+
+        Yields:
+            ChatResponseAsyncGen: Chunks of the answer as ChatResponse objects.
+        """
+        words = cached_answered.split(" ")
+        accumulated_content = ""
+
+        for i, word in enumerate(words):
+            # Append space back to all but the last word to maintain original spacing
+            delta = word + (" " if i < len(words) - 1 else "")
+            accumulated_content += delta
+            yield ChatResponse(
+                message=ChatMessage(
+                    role=MessageRole.ASSISTANT,
+                    content=accumulated_content
+                ),
+                delta=delta
+            )
+
+            await asyncio.sleep(0.005)
     # ==========================================
     #                 STEPS
     # ==========================================
@@ -439,20 +461,7 @@ class RAGWorkflow(Workflow):
                     ChatMessage(role=MessageRole.SYSTEM, content=cached_answer)
                 )
 
-                class FakeChunk:
-                    """Workaround in order to mimic streaming to the UI"""
-
-                    def __init__(self, text: str):
-                        self.delta = text
-
-                async def cached_response_generator() -> AsyncGenerator[FakeChunk, None]:
-                    for word in cached_answer.split(" "):
-                        yield FakeChunk(word + " ")
-                        await asyncio.sleep(
-                            0.005
-                        )  # make streaming more natural and not so bursty
-
-                return StopEvent(result=cached_response_generator())
+                return StopEvent(result=self._generate_cached_stream(cached_answered=cached_answer))
         logger.info("Cache Miss")
         # If Cache misses, proceed to Retrieval
         return RetrieveEvent(query=ev.condensed_query)
