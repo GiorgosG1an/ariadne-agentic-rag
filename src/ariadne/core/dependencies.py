@@ -31,7 +31,7 @@ logger: logging.Logger = logging.getLogger("RAG_Workflow")
 # --- Rate Limiter ---
 rate_limiter: TokenBucketRateLimiter = TokenBucketRateLimiter(
     requests_per_minute=100,
-    tokens_per_minute=500000
+    tokens_per_minute=100_000
 )
 # --- Models ---
 # main llm for the final answer
