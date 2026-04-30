@@ -317,11 +317,20 @@ class RAGWorkflow(Workflow):
 
         Returns:
             RouteEvent: Event to trigger the routing step.
+
+        Raises:
+            ValueError: If the user message exceeds the maximum allowed length.
         """
         # set the context var for logging
         session_context.set(self.session_id)
 
         user_msg = ev.user_msg
+
+        # Defense-in-depth: Validate input length
+        if len(user_msg) > settings.max_query_length:
+            logger.error(f"Input validation failed: query length {len(user_msg)} > {settings.max_query_length}")
+            raise ValueError(f"Query exceeds maximum allowed length of {settings.max_query_length} characters.")
+
         await ctx.store.set("query", user_msg)
         await ctx.store.set("retries", 0)
         await self.memory.aput(ChatMessage(role=MessageRole.USER, content=user_msg))
