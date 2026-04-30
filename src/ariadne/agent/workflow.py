@@ -72,6 +72,7 @@ class SmartAutoRetriever(VectorIndexAutoRetriever):
             **kwargs: Arbitrary keyword arguments.
         """
         super().__init__(*args, **kwargs)
+        self._embed_model = kwargs.get("embed_model") or embed_model
 
     async def aretrieve_with_spec(
         self, str_or_query_bundle: str | QueryBundle
@@ -92,7 +93,18 @@ class SmartAutoRetriever(VectorIndexAutoRetriever):
         else:
             query_bundle = str_or_query_bundle
 
-        spec = await self.agenerate_retrieval_spec(query_bundle)
+        if query_bundle.embedding is None:
+            # Parallelize LLM spec generation and query embedding.
+            emb_query = query_bundle.custom_embedding_strs[0] if query_bundle.custom_embedding_strs else query_bundle.query_str
+            
+            spec, embedding = await asyncio.gather(
+                self.agenerate_retrieval_spec(query_bundle=query_bundle),
+                self._embed_model.aget_query_embedding(emb_query)
+            )
+            query_bundle.embedding = embedding
+        else:
+            spec = await self.agenerate_retrieval_spec(query_bundle)
+        
         retriever, _ = self._build_retriever_from_spec(spec=spec)
 
         nodes = await retriever.aretrieve(query_bundle)
@@ -453,7 +465,7 @@ class RAGWorkflow(Workflow):
 
         ctx.write_event_to_stream(
             UIProgressEvent(
-                step_name="Αναζήτηση", msg=f"Ανάκτηση από τα έγγραφα του τμήματος"
+                step_name="Αναζήτηση", msg="Ανάκτηση από τα έγγραφα του τμήματος"
             )
         )
         # GEMINI EMBEDDING 2 PREFIX 
@@ -467,12 +479,15 @@ class RAGWorkflow(Workflow):
         # Try Auto Retriever
         nodes, spec = await self.auto_index_retriever.aretrieve_with_spec(query_bundle)
 
+        # Store the query bundle in context to reuse the embedding later
+        await ctx.store.set("query_bundle", query_bundle)
+
         # Try Fallback Retriever if Auto failed
         if not nodes:
             logger.warning(
                 "AutoRetriever failed. Falling back to VectorIndexRetriever."
             )
-            nodes = await self.index_retriever.aretrieve(ev.query)
+            nodes = await self.index_retriever.aretrieve(query_bundle)
             spec = None
 
         # Check if both failed -> Retry Logic
@@ -602,8 +617,14 @@ class RAGWorkflow(Workflow):
                 logger.info(
                     "Saving query to Cache", extra={"top_node_score": top_node_score}
                 )
+
+                # Reuse the query embedding to avoid redundant embedding call.
+                query_bundle: Optional[QueryBundle] = await ctx.store.get("query_bundle")
+                embedding = query_bundle.embedding if query_bundle else None
+
                 cache_doc = Document(
                     text=condensed_query,
+                    embedding=embedding,
                     metadata={"answer": full_response},
                     excluded_embed_metadata_keys=["answer"],
                     excluded_llm_metadata_keys=["answer"],
