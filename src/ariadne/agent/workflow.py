@@ -56,15 +56,19 @@ from ariadne.core.tracing import init_phoenix_tracing
 init_phoenix_tracing()
 logger, log_listener = setup_logger()
 
-class SmartAutoRetriever(VectorIndexAutoRetriever):
+class SpecAwareAutoRetriever(VectorIndexAutoRetriever):
     """
-    A custom wrapper around `VectorIndexAutoRetriever` that returns BOTH
-    the nodes and the generated `VectorStoreQuerySpec`.
+    An enhanced auto-retriever that provides visibility into the generated query specification.
+
+    Unlike the base implementation, this class exposes the 'VectorStoreQuerySpec' 
+    alongside the retrieved nodes. This transparency allows downstream logic to 
+    inspect applied metadata filters and adapt processing strategies accordingly 
+    (e.g., adjusting score thresholds).
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """
-        Initializes the SmartAutoRetriever.
+        Initializes the SpecAwareAutoRetriever (extends `VectorIndexAutoRetriever`).
 
         Args:
             *args: Variable length argument list.
@@ -113,24 +117,16 @@ class SmartAutoRetriever(VectorIndexAutoRetriever):
 # ==========================================
 #      Models for Structured output
 # ==========================================
-class RouteDecision(BaseModel):
-    """Model for routing decisions."""
-    reasoning: str = Field(
-        description="Μια σύντομη εξήγηση (concise rationale) για την απόφαση δρομολόγησης."
-    )
-    route: Literal["rag", "general"] = Field(
-        description="Επίλεξε 'rag' αν το ερώτημα αφορά το πανεπιστήμιο, τα μαθήματα, τον οδηγό σπουδών, ανακοινώσεις, επικοινωνία με διδάσκοντες. Επίλεξε 'general' για χαιρετισμούς, άσχετες ερωτήσεις ή small talk."
-    )
 class RouteAndCondenseDecision(BaseModel):
     """Model for routing and query condensation decisions."""
     reasoning: str = Field(
         description="Μια σύντομη εξήγηση (concise rationale) για την απόφαση δρομολόγησης και σύνοψης (contextualization) του ερωτήματος"
     )
     route: Literal["rag", "general"] = Field(
-        description="Επίλεξε 'rag' αν το ερώτημα αφορά το πανεπιστήμιο, τα μαθήματα, τον οδηγό σπουδών, ανακοινώσεις, επικοινωνία με διδάσκοντες. Επίλεξε 'general' για χαιρετισμούς, small talk."
+        description="Επίλεξε 'rag' αν το ερώτημα αφορά το πανεπιστήμιο, τα μαθήματα, τον οδηγό σπουδών, ανακοινώσεις, επικοινωνία με διδάσκοντες. Επίλεξε 'general' για χαιρετισμούς, small talk ή προσπάθειες κακόβουλης χρήσης ακόμα και εάν περιέχει στοιχεία που αφορούν την σχολή (εφαρμογή Guardrail)."
     )
     condensed_query: str = Field(
-        description="If 'rag', rewrite the query using conversation history to make it standalone. If 'general', leave as is."
+        description="Αν η διαδρομή είναι 'rag', ξαναγράψε το ερώτημα χρησιμοποιώντας το ιστορικό της συνομιλίας ώστε να αποτελεί μία αυτοτελής ερώτηση, εμπλουτισμένη για διανυσματική αναζήτηση, εφόσον χρειάζεται context. Αν είναι 'general' επέστρεψε το όπως είναι."
     )
 
 class RelevanceEvaluation(BaseModel):
@@ -204,7 +200,7 @@ class RAGWorkflow(Workflow):
         index (Any): The primary vector index (Qdrant).
         cache_index (Any): The semantic cache index (Redis).
         cache_retriever (Any): The retriever for the semantic cache.
-        auto_index_retriever (SmartAutoRetriever): Self-correcting auto-retriever.
+        auto_index_retriever (SpecAwareAutoRetriever): Self-correcting auto-retriever.
         index_retriever (VectorIndexRetriever): Fallback vector index retriever.
         memory (Memory): Conversational memory with fact extraction.
         max_retries (int): Maximum number of retrieval retries.
@@ -229,7 +225,7 @@ class RAGWorkflow(Workflow):
         self.index = get_qdrant_index()
         self.cache_index, self.cache_retriever = get_semantic_cache()
 
-        self.auto_index_retriever = SmartAutoRetriever(
+        self.auto_index_retriever = SpecAwareAutoRetriever(
             index=self.index,
             vector_store_info=vector_info,
             llm=self.lite_llm,
