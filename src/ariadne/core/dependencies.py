@@ -49,12 +49,14 @@ lite_llm: GoogleGenAI = GoogleGenAI(
     model=settings.lite_llm_model,
     api_key=settings.google_api_key,
     temperature=0.1,
+    rate_limiter=rate_limiter,
 )
 # same as above but without token restriction, used for fact memory block
 fact_llm: GoogleGenAI = GoogleGenAI(
     model=settings.lite_llm_model,
     api_key=settings.google_api_key,
     temperature=0.2,
+    rate_limiter=rate_limiter,
 )
 
 # Embed model for retrieving

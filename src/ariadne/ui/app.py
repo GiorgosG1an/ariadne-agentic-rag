@@ -12,6 +12,7 @@ from time import perf_counter
 from typing import Optional
 
 from ariadne.agent.workflow import RAGWorkflow, UIProgressEvent
+from ariadne.core.config import settings
 from ariadne.core.logger import setup_logger, session_context
 
 logger, log_listener = setup_logger()
@@ -56,6 +57,13 @@ async def main(message: cl.Message) -> None:
         start_time: float = perf_counter()
         logger.info("UI: Received user message", extra={"user_msg": message.content})
 
+        if len(message.content) > settings.max_query_length:
+            logger.warning(f"User query too long: {len(message.content)} chars")
+            await cl.Message(
+                content=f"Το μήνυμά σας είναι πολύ μεγάλο ({len(message.content)} χαρακτήρες). Παρακαλώ περιορίστε το ερώτημά σας στους {settings.max_query_length} χαρακτήρες.",
+                author='Ariadne AI Assistant'
+            ).send()
+            return
 
         handler = workflow.run(user_msg=message.content)
 
