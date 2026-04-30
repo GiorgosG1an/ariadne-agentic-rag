@@ -61,7 +61,7 @@ async def main(message: cl.Message) -> None:
             logger.warning(f"User query too long: {len(message.content)} chars")
             await cl.Message(
                 content=f"Το μήνυμά σας είναι πολύ μεγάλο ({len(message.content)} χαρακτήρες). Παρακαλώ περιορίστε το ερώτημά σας στους {settings.max_query_length} χαρακτήρες.",
-                author='Ariadne AI Assistant'
+                author='Ariadne'
             ).send()
             return
 
