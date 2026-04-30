@@ -72,6 +72,7 @@ class SmartAutoRetriever(VectorIndexAutoRetriever):
             **kwargs: Arbitrary keyword arguments.
         """
         super().__init__(*args, **kwargs)
+        self._embed_model = kwargs.get("embed_model") or embed_model
 
     async def aretrieve_with_spec(
         self, str_or_query_bundle: str | QueryBundle
@@ -92,7 +93,18 @@ class SmartAutoRetriever(VectorIndexAutoRetriever):
         else:
             query_bundle = str_or_query_bundle
 
-        spec = await self.agenerate_retrieval_spec(query_bundle)
+        if query_bundle.embedding is None:
+            # Parallelize LLM spec generation and query embedding.
+            emb_query = query_bundle.custom_embedding_strs[0] if query_bundle.custom_embedding_strs else query_bundle.query_str
+            
+            spec, embedding = await asyncio.gather(
+                self.agenerate_retrieval_spec(query_bundle=query_bundle),
+                self._embed_model.aget_query_embedding(emb_query)
+            )
+            query_bundle.embedding = embedding
+        else:
+            spec = await self.agenerate_retrieval_spec(query_bundle)
+        
         retriever, _ = self._build_retriever_from_spec(spec=spec)
 
         nodes = await retriever.aretrieve(query_bundle)
@@ -354,8 +366,8 @@ class RAGWorkflow(Workflow):
 
         ctx.write_event_to_stream(
             UIProgressEvent(
-                step_name="Δρομολόγηση Ερωτήματος",
-                msg="Γίνεται αναζήτηση στα αρχεία του τμήματος",
+                step_name="Κατανόηση Ερωτήματος",
+                msg="Αναλύω το ερώτημά σας για να δω πώς μπορώ να βοηθήσω καλύτερα.",
             )
         )
 
@@ -411,8 +423,8 @@ class RAGWorkflow(Workflow):
 
                 ctx.write_event_to_stream(
                     UIProgressEvent(
-                        step_name="Semantic Cache",
-                        msg="Η απάντηση ανασύρθηκε άμεσα από την προσωρινή μνήμη (Cache)!",
+                        step_name="Άμεση Ανάκτηση",
+                        msg="Βρήκα μία πρόσφατη απάντηση που ταιριάζει απόλυτα!",
                     )
                 )
 
@@ -462,7 +474,8 @@ class RAGWorkflow(Workflow):
 
         ctx.write_event_to_stream(
             UIProgressEvent(
-                step_name="Αναζήτηση", msg="Ανάκτηση από τα έγγραφα του τμήματος"
+                step_name="Αναζήτηση Πηγών", 
+                msg=f"Ψάχνω στα επίσημα έγγραφα του Τμήματος...",
             )
         )
         # GEMINI EMBEDDING 2 PREFIX 
@@ -476,12 +489,15 @@ class RAGWorkflow(Workflow):
         # Try Auto Retriever
         nodes, spec = await self.auto_index_retriever.aretrieve_with_spec(query_bundle)
 
+        # Store the query bundle in context to reuse the embedding later
+        await ctx.store.set("query_bundle", query_bundle)
+
         # Try Fallback Retriever if Auto failed
         if not nodes:
             logger.warning(
                 "AutoRetriever failed. Falling back to VectorIndexRetriever."
             )
-            nodes = await self.index_retriever.aretrieve(ev.query)
+            nodes = await self.index_retriever.aretrieve(query_bundle)
             spec = None
 
         # Check if both failed -> Retry Logic
@@ -555,6 +571,11 @@ class RAGWorkflow(Workflow):
             "Αφαίρεσε πολύπλοκους όρους και κράτα την ουσία.\n\n"
             "Αρχικό Ερώτημα: {query}"
         )
+        
+        ctx.write_event_to_stream(UIProgressEvent(
+            step_name="Επαναδιατύπωση",
+            msg="Χρειάζομαι λίγο παραπάνω χρόνο για να διευρύνω την αναζήτηση..."
+        ))
 
         rewritten_data: RewriteQuery = await self.lite_llm.astructured_predict(
             output_cls=RewriteQuery, prompt=rewrite_prompt, query=ev.query
@@ -585,7 +606,8 @@ class RAGWorkflow(Workflow):
         """
         ctx.write_event_to_stream(
             UIProgressEvent(
-                step_name="Σύνθεση απάντησης", msg="Γίνεται σύνθεση της απάντησης."
+                step_name="Δημιουργία Απάντησης", 
+                msg="Συνθέτω την απάντηση για εσάς..."
             )
         )
         context_str = "\n\n".join([n.node.get_content() for n in ev.nodes])
@@ -611,8 +633,14 @@ class RAGWorkflow(Workflow):
                 logger.info(
                     "Saving query to Cache", extra={"top_node_score": top_node_score}
                 )
+
+                # Reuse the query embedding to avoid redundant embedding call.
+                query_bundle: Optional[QueryBundle] = await ctx.store.get("query_bundle")
+                embedding = query_bundle.embedding if query_bundle else None
+
                 cache_doc = Document(
                     text=condensed_query,
+                    embedding=embedding,
                     metadata={"answer": full_response},
                     excluded_embed_metadata_keys=["answer"],
                     excluded_llm_metadata_keys=["answer"],
@@ -654,12 +682,16 @@ class RAGWorkflow(Workflow):
             StopEvent: Event marking the end of the workflow with the response stream.
         """
 
+        ctx.write_event_to_stream(UIProgressEvent(
+            step_name="Φιλική Συζήτηση",
+            msg="Ετοιμάζω την απάντηση μου..."
+        ))
+
         await ctx.store.set("retrieved_texts", [])
         sys_message = ChatMessage(
             role=MessageRole.SYSTEM,
             content=f"{system_prompt}\n\nΟΔΗΓΙΑ: Απάντησε φυσικά, δίχως να ψάξεις στα έγγραφα. Αν σε ρωτάνε κάτι άσχετο με τη σχολή, υπενθύμισε ευγενικά τον ρόλο σου.",
         )
-
         chat_history = await self.memory.aget()
         messages = [sys_message] + chat_history
         raw_response_stream = await self.llm.astream_chat(messages)
@@ -684,6 +716,11 @@ class RAGWorkflow(Workflow):
         Returns:
             StopEvent: Event marking the end of the workflow with the response stream.
         """
+
+        ctx.write_event_to_stream(UIProgressEvent(
+            step_name="Τελική Προσπάθεια",
+            msg="Παρά τις προσπάθειες μου δεν κατάφερα να βρω κάτι σχετικό. Σύνθεση απολογιτικής απάντησης..."
+        ))
 
         await ctx.store.set("retrieved_texts", [])
         sys_message = ChatMessage(
