@@ -357,8 +357,8 @@ class RAGWorkflow(Workflow):
 
         ctx.write_event_to_stream(
             UIProgressEvent(
-                step_name="Δρομολόγηση Ερωτήματος",
-                msg="Γίνεται αναζήτηση στα αρχεία του τμήματος",
+                step_name="Κατανόηση Ερωτήματος",
+                msg="Αναλύω το ερώτημά σας για να δω πώς μπορώ να βοηθήσω καλύτερα.",
             )
         )
 
@@ -414,8 +414,8 @@ class RAGWorkflow(Workflow):
 
                 ctx.write_event_to_stream(
                     UIProgressEvent(
-                        step_name="Semantic Cache",
-                        msg="Η απάντηση ανασύρθηκε άμεσα από την προσωρινή μνήμη (Cache)!",
+                        step_name="Άμεση Ανάκτηση",
+                        msg="Βρήκα μία πρόσφατη απάντηση που ταιριάζει απόλυτα!",
                     )
                 )
 
@@ -465,7 +465,8 @@ class RAGWorkflow(Workflow):
 
         ctx.write_event_to_stream(
             UIProgressEvent(
-                step_name="Αναζήτηση", msg="Ανάκτηση από τα έγγραφα του τμήματος"
+                step_name="Αναζήτηση Πηγών", 
+                msg=f"Ψάχνω στα επίσημα έγγραφα του Τμήματος...",
             )
         )
         # GEMINI EMBEDDING 2 PREFIX 
@@ -561,6 +562,11 @@ class RAGWorkflow(Workflow):
             "Αφαίρεσε πολύπλοκους όρους και κράτα την ουσία.\n\n"
             "Αρχικό Ερώτημα: {query}"
         )
+        
+        ctx.write_event_to_stream(UIProgressEvent(
+            step_name="Επαναδιατύπωση",
+            msg="Χρειάζομαι λίγο παραπάνω χρόνο για να διευρύνω την αναζήτηση..."
+        ))
 
         rewritten_data: RewriteQuery = await self.lite_llm.astructured_predict(
             output_cls=RewriteQuery, prompt=rewrite_prompt, query=ev.query
@@ -591,7 +597,8 @@ class RAGWorkflow(Workflow):
         """
         ctx.write_event_to_stream(
             UIProgressEvent(
-                step_name="Σύνθεση απάντησης", msg="Γίνεται σύνθεση της απάντησης."
+                step_name="Δημιουργία Απάντησης", 
+                msg="Συνθέτω την απάντηση για εσάς..."
             )
         )
         context_str = "\n\n".join([n.node.get_content() for n in ev.nodes])
@@ -666,12 +673,16 @@ class RAGWorkflow(Workflow):
             StopEvent: Event marking the end of the workflow with the response stream.
         """
 
+        ctx.write_event_to_stream(UIProgressEvent(
+            step_name="Φιλική Συζήτηση",
+            msg="Ετοιμάζω την απάντηση μου..."
+        ))
+
         await ctx.store.set("retrieved_texts", [])
         sys_message = ChatMessage(
             role=MessageRole.SYSTEM,
             content=f"{system_prompt}\n\nΟΔΗΓΙΑ: Απάντησε φυσικά, δίχως να ψάξεις στα έγγραφα. Αν σε ρωτάνε κάτι άσχετο με τη σχολή, υπενθύμισε ευγενικά τον ρόλο σου.",
         )
-
         chat_history = await self.memory.aget()
         messages = [sys_message] + chat_history
         raw_response_stream = await self.llm.astream_chat(messages)
@@ -696,6 +707,11 @@ class RAGWorkflow(Workflow):
         Returns:
             StopEvent: Event marking the end of the workflow with the response stream.
         """
+
+        ctx.write_event_to_stream(UIProgressEvent(
+            step_name="Τελική Προσπάθεια",
+            msg="Παρά τις προσπάθειες μου δεν κατάφερα να βρω κάτι σχετικό. Σύνθεση απολογιτικής απάντησης..."
+        ))
 
         await ctx.store.set("retrieved_texts", [])
         sys_message = ChatMessage(

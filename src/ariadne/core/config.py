@@ -15,6 +15,7 @@ class AppSettings(BaseSettings):
 
     Attributes:
         google_api_key (str): API key for Google Gemini services.
+        max_query_length (int): Maximum allowed length for user queries.
         llm_model (str): The main Gemini model identifier.
         lite_llm_model (str): The lightweight Gemini model identifier.
         embed_model (str): The Gemini embedding model identifier.
@@ -31,7 +32,10 @@ class AppSettings(BaseSettings):
         model_config (SettingsConfigDict): Pydantic configuration for settings.
     """
     # Api keys
-    google_api_key: str
+    google_api_key: str = "dummy_key"
+
+    # Security
+    max_query_length: int = 1000
 
     # Models
     llm_model: str = "gemini-2.5-flash" #  gemini-3.1-flash-lite-preview
