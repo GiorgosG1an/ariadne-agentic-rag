@@ -242,3 +242,4 @@ qdrant_data/
 redis_data/
 .vscode/
 .chainlit/translations/
+!.chainlit/translations/el-GR.json
