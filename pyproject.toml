@@ -3,6 +3,10 @@ name = "ariadne-agentic-rag"
 version = "0.1.0"
 description = "Event-Driven Agentic RAG for DIT UOP"
 readme = "README.md"
+license = "MIT"
+authors = [
+    {name="Georgios Giannopoulos", email="georgegiannopoulos2@gmail.com"}
+]
 requires-python = ">=3.12"
 dependencies = [
     "aiohttp>=3.13.5",
