@@ -115,4 +115,4 @@ Contributions, issues, and feature requests are welcome!
 ## License & Acknowledgments
 Developed by [Giorgos Giannopoulos](https://github.com/GiorgosG1an) as undergraduate thesis project for the Department of Informatics and Telecommunications, University of Peloponnese.
 
-This project is licensed under the **MIT License** - see the[LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
