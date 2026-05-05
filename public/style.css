@@ -1,0 +1,22 @@
+/* Στοχεύουμε την εικόνα με βάση την κλάση .logo και το alt="logo" */
+img.logo[alt="logo"] {
+    /* Χρησιμοποιούμε το πλάτος που θέλεις, π.χ. 450px ή 500px */
+    width: 500px !important; 
+    
+    /* Ακυρώνουμε τα εσωτερικά όρια του Chainlit */
+    max-width: 90vw !important;
+    min-width: 300px !important;
+    
+    /* Διορθώνουμε το ύψος για να μην παραμορφώνεται */
+    height: auto !important;
+    max-height: 150px !important;
+    
+    /* Σιγουρευόμαστε ότι δεν επηρεάζεται από το layout */
+    aspect-ratio: 960 / 188 !important;
+    object-fit: contain !important;
+}
+
+/* Αν θέλεις να μεγαλώσει και το κενό κάτω από την εικόνα */
+.logo.mb-2 {
+    margin-bottom: 2rem !important;
+}
