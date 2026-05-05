@@ -1,100 +1,100 @@
 {
     "common": {
         "actions": {
-            "cancel": "\u0386\u03ba\u03c5\u03c1\u03bf",
-            "confirm": "\u0395\u03c0\u03b9\u03b2\u03b5\u03b2\u03b1\u03af\u03c9\u03c3\u03b7",
-            "continue": "\u03a3\u03c5\u03bd\u03ad\u03c7\u03b5\u03b9\u03b1",
-            "goBack": "\u0395\u03c0\u03b9\u03c3\u03c4\u03c1\u03bf\u03c6\u03ae",
-            "reset": "\u0395\u03c0\u03b1\u03bd\u03b1\u03c6\u03bf\u03c1\u03ac",
-            "submit": "\u03a5\u03c0\u03bf\u03b2\u03bf\u03bb\u03ae"
+            "cancel": "Άκυρο",
+            "confirm": "Επιβεβαίωση",
+            "continue": "Συνέχεια",
+            "goBack": "Επιστροφή",
+            "reset": "Επαναφορά",
+            "submit": "Υποβολή"
         },
         "status": {
-            "loading": "\u03a6\u03cc\u03c1\u03c4\u03c9\u03c3\u03b7...",
+            "loading": "Φόρτωση...",
             "error": {
-                "default": "\u03a0\u03b1\u03c1\u03bf\u03c5\u03c3\u03b9\u03ac\u03c3\u03c4\u03b7\u03ba\u03b5 \u03c3\u03c6\u03ac\u03bb\u03bc\u03b1",
-                "serverConnection": "\u0394\u03b5\u03bd \u03ae\u03c4\u03b1\u03bd \u03b4\u03c5\u03bd\u03b1\u03c4\u03ae \u03b7 \u03b5\u03c0\u03b9\u03ba\u03bf\u03b9\u03bd\u03c9\u03bd\u03af\u03b1 \u03bc\u03b5 \u03c4\u03bf\u03bd \u03b4\u03b9\u03b1\u03ba\u03bf\u03bc\u03b9\u03c3\u03c4\u03ae"
+                "default": "Παρουσιάστηκε σφάλμα",
+                "serverConnection": "Δεν ήταν δυνατή η επικοινωνία με τον διακομιστή"
             }
         }
     },
     "auth": {
         "login": {
-            "title": "\u03a3\u03c5\u03bd\u03b4\u03b5\u03b8\u03b5\u03af\u03c4\u03b5 \u03b3\u03b9\u03b1 \u03bd\u03b1 \u03b1\u03c0\u03bf\u03ba\u03c4\u03ae\u03c3\u03b5\u03c4\u03b5 \u03c0\u03c1\u03cc\u03c3\u03b2\u03b1\u03c3\u03b7 \u03c3\u03c4\u03b7\u03bd \u03b5\u03c6\u03b1\u03c1\u03bc\u03bf\u03b3\u03ae",
+            "title": "Συνδεθείτε για να αποκτήσετε πρόσβαση στην εφαρμογή",
             "form": {
                 "email": {
-                    "label": "\u0394\u03b9\u03b5\u03cd\u03b8\u03c5\u03bd\u03c3\u03b7 \u03b7\u03bb\u03b5\u03ba\u03c4\u03c1\u03bf\u03bd\u03b9\u03ba\u03bf\u03cd \u03c4\u03b1\u03c7\u03c5\u03b4\u03c1\u03bf\u03bc\u03b5\u03af\u03bf\u03c5",
-                    "required": "\u03a4\u03bf email \u03b5\u03af\u03bd\u03b1\u03b9 \u03c5\u03c0\u03bf\u03c7\u03c1\u03b5\u03c9\u03c4\u03b9\u03ba\u03cc \u03c0\u03b5\u03b4\u03af\u03bf",
+                    "label": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
+                    "required": "Το email είναι υποχρεωτικό πεδίο",
                     "placeholder": "me@example.com"
                 },
                 "password": {
-                    "label": "\u039a\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2 \u03c0\u03c1\u03cc\u03c3\u03b2\u03b1\u03c3\u03b7\u03c2",
-                    "required": "\u039f \u03ba\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2 \u03c0\u03c1\u03cc\u03c3\u03b2\u03b1\u03c3\u03b7\u03c2 \u03b5\u03af\u03bd\u03b1\u03b9 \u03c5\u03c0\u03bf\u03c7\u03c1\u03b5\u03c9\u03c4\u03b9\u03ba\u03cc \u03c0\u03b5\u03b4\u03af\u03bf"
+                    "label": "Κωδικός πρόσβασης",
+                    "required": "Ο κωδικός πρόσβασης είναι υποχρεωτικό πεδίο"
                 },
                 "actions": {
-                    "signin": "\u03a3\u03cd\u03bd\u03b4\u03b5\u03c3\u03b7"
+                    "signin": "Σύνδεση"
                 },
                 "alternativeText": {
-                    "or": "\u03ae"
+                    "or": "ή"
                 }
             },
             "errors": {
-                "default": "\u0394\u03b5\u03bd \u03b5\u03af\u03bd\u03b1\u03b9 \u03b4\u03c5\u03bd\u03b1\u03c4\u03ae \u03b7 \u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03b7",
-                "signin": "\u0394\u03bf\u03ba\u03b9\u03bc\u03ac\u03c3\u03c4\u03b5 \u03bd\u03b1 \u03c3\u03c5\u03bd\u03b4\u03b5\u03b8\u03b5\u03af\u03c4\u03b5 \u03bc\u03b5 \u03b4\u03b9\u03b1\u03c6\u03bf\u03c1\u03b5\u03c4\u03b9\u03ba\u03cc \u03bb\u03bf\u03b3\u03b1\u03c1\u03b9\u03b1\u03c3\u03bc\u03cc",
-                "oauthSignin": "\u0394\u03bf\u03ba\u03b9\u03bc\u03ac\u03c3\u03c4\u03b5 \u03bd\u03b1 \u03c3\u03c5\u03bd\u03b4\u03b5\u03b8\u03b5\u03af\u03c4\u03b5 \u03bc\u03b5 \u03b4\u03b9\u03b1\u03c6\u03bf\u03c1\u03b5\u03c4\u03b9\u03ba\u03cc \u03bb\u03bf\u03b3\u03b1\u03c1\u03b9\u03b1\u03c3\u03bc\u03cc",
-                "redirectUriMismatch": "\u039f \u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03bc\u03bf\u03c2 \u03b1\u03bd\u03b1\u03ba\u03b1\u03c4\u03b5\u03cd\u03b8\u03c5\u03bd\u03c3\u03b7\u03c2 \u03b4\u03b5\u03bd \u03c4\u03b1\u03b9\u03c1\u03b9\u03ac\u03b6\u03b5\u03b9 \u03bc\u03b5 \u03c4\u03b7 \u03c1\u03cd\u03b8\u03bc\u03b9\u03c3\u03b7 \u03c4\u03b7\u03c2 \u03b1\u03c5\u03b8\u03b5\u03bd\u03c4\u03b9\u03ba\u03bf\u03c0\u03bf\u03b9\u03ae\u03c3\u03b7\u03c2 \u03c4\u03b7\u03c2 \u03b5\u03c6\u03b1\u03c1\u03bc\u03bf\u03b3\u03ae\u03c2",
-                "oauthCallback": "\u0394\u03bf\u03ba\u03b9\u03bc\u03ac\u03c3\u03c4\u03b5 \u03bd\u03b1 \u03c3\u03c5\u03bd\u03b4\u03b5\u03b8\u03b5\u03af\u03c4\u03b5 \u03bc\u03b5 \u03b4\u03b9\u03b1\u03c6\u03bf\u03c1\u03b5\u03c4\u03b9\u03ba\u03cc \u03bb\u03bf\u03b3\u03b1\u03c1\u03b9\u03b1\u03c3\u03bc\u03cc",
-                "oauthCreateAccount": "\u0394\u03bf\u03ba\u03b9\u03bc\u03ac\u03c3\u03c4\u03b5 \u03bd\u03b1 \u03c3\u03c5\u03bd\u03b4\u03b5\u03b8\u03b5\u03af\u03c4\u03b5 \u03bc\u03b5 \u03b4\u03b9\u03b1\u03c6\u03bf\u03c1\u03b5\u03c4\u03b9\u03ba\u03cc \u03bb\u03bf\u03b3\u03b1\u03c1\u03b9\u03b1\u03c3\u03bc\u03cc",
-                "emailCreateAccount": "\u0394\u03bf\u03ba\u03b9\u03bc\u03ac\u03c3\u03c4\u03b5 \u03bd\u03b1 \u03c3\u03c5\u03bd\u03b4\u03b5\u03b8\u03b5\u03af\u03c4\u03b5 \u03bc\u03b5 \u03b4\u03b9\u03b1\u03c6\u03bf\u03c1\u03b5\u03c4\u03b9\u03ba\u03cc \u03bb\u03bf\u03b3\u03b1\u03c1\u03b9\u03b1\u03c3\u03bc\u03cc",
-                "callback": "\u0394\u03bf\u03ba\u03b9\u03bc\u03ac\u03c3\u03c4\u03b5 \u03bd\u03b1 \u03c3\u03c5\u03bd\u03b4\u03b5\u03b8\u03b5\u03af\u03c4\u03b5 \u03bc\u03b5 \u03b4\u03b9\u03b1\u03c6\u03bf\u03c1\u03b5\u03c4\u03b9\u03ba\u03cc \u03bb\u03bf\u03b3\u03b1\u03c1\u03b9\u03b1\u03c3\u03bc\u03cc",
-                "oauthAccountNotLinked": "\u0393\u03b9\u03b1 \u03bd\u03b1 \u03b5\u03c0\u03b9\u03b2\u03b5\u03b2\u03b1\u03b9\u03ce\u03c3\u03b5\u03c4\u03b5 \u03c4\u03b7\u03bd \u03c4\u03b1\u03c5\u03c4\u03cc\u03c4\u03b7\u03c4\u03ac \u03c3\u03b1\u03c2, \u03c3\u03c5\u03bd\u03b4\u03b5\u03b8\u03b5\u03af\u03c4\u03b5 \u03bc\u03b5 \u03c4\u03bf\u03bd \u03af\u03b4\u03b9\u03bf \u03bb\u03bf\u03b3\u03b1\u03c1\u03b9\u03b1\u03c3\u03bc\u03cc \u03c0\u03bf\u03c5 \u03c7\u03c1\u03b7\u03c3\u03b9\u03bc\u03bf\u03c0\u03bf\u03b9\u03ae\u03c3\u03b1\u03c4\u03b5 \u03b1\u03c1\u03c7\u03b9\u03ba\u03ac",
-                "emailSignin": "\u0394\u03b5\u03bd \u03ae\u03c4\u03b1\u03bd \u03b4\u03c5\u03bd\u03b1\u03c4\u03ae \u03b7 \u03b1\u03c0\u03bf\u03c3\u03c4\u03bf\u03bb\u03ae \u03c4\u03bf\u03c5 email",
-                "emailVerify": "\u03a0\u03b1\u03c1\u03b1\u03ba\u03b1\u03bb\u03ce \u03b5\u03c0\u03b1\u03bb\u03b7\u03b8\u03b5\u03cd\u03c3\u03c4\u03b5 \u03c4\u03b7\u03bd \u03b4\u03b9\u03b5\u03cd\u03b8\u03c5\u03bd\u03c3\u03b7 \u03b7\u03bb\u03b5\u03ba\u03c4\u03c1\u03bf\u03bd\u03b9\u03ba\u03bf\u03cd \u03c4\u03b1\u03c7\u03c5\u03b4\u03c1\u03bf\u03bc\u03b5\u03af\u03bf\u03c5 \u03c3\u03b1\u03c2, \u03ad\u03bd\u03b1 \u03bd\u03ad\u03bf email \u03c3\u03b1\u03c2 \u03ad\u03c7\u03b5\u03b9 \u03c3\u03c4\u03b1\u03bb\u03b5\u03af",
-                "credentialsSignin": "\u0397 \u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03b7 \u03b1\u03c0\u03ad\u03c4\u03c5\u03c7\u03b5. \u0395\u03bb\u03ad\u03b3\u03be\u03c4\u03b5 \u03cc\u03c4\u03b9 \u03c4\u03b1 \u03c3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03c0\u03bf\u03c5 \u03b4\u03ce\u03c3\u03b1\u03c4\u03b5 \u03b5\u03af\u03bd\u03b1\u03b9 \u03c3\u03c9\u03c3\u03c4\u03ac",
-                "sessionRequired": "\u03a0\u03b1\u03c1\u03b1\u03ba\u03b1\u03bb\u03ce \u03c3\u03c5\u03bd\u03b4\u03b5\u03b8\u03b5\u03af\u03c4\u03b5 \u03b3\u03b9\u03b1 \u03bd\u03b1 \u03b1\u03c0\u03bf\u03ba\u03c4\u03ae\u03c3\u03b5\u03c4\u03b5 \u03c0\u03c1\u03cc\u03c3\u03b2\u03b1\u03c3\u03b7 \u03c3\u03b5 \u03b1\u03c5\u03c4\u03ae\u03bd \u03c4\u03b7 \u03c3\u03b5\u03bb\u03af\u03b4\u03b1"
+                "default": "Δεν είναι δυνατή η σύνδεση",
+                "signin": "Δοκιμάστε να συνδεθείτε με διαφορετικό λογαριασμό",
+                "oauthSignin": "Δοκιμάστε να συνδεθείτε με διαφορετικό λογαριασμό",
+                "redirectUriMismatch": "Ο σύνδεσμος ανακατεύθυνσης δεν ταιριάζει με τη ρύθμιση της αυθεντικοποίησης της εφαρμογής",
+                "oauthCallback": "Δοκιμάστε να συνδεθείτε με διαφορετικό λογαριασμό",
+                "oauthCreateAccount": "Δοκιμάστε να συνδεθείτε με διαφορετικό λογαριασμό",
+                "emailCreateAccount": "Δοκιμάστε να συνδεθείτε με διαφορετικό λογαριασμό",
+                "callback": "Δοκιμάστε να συνδεθείτε με διαφορετικό λογαριασμό",
+                "oauthAccountNotLinked": "Για να επιβεβαιώσετε την ταυτότητά σας, συνδεθείτε με τον ίδιο λογαριασμό που χρησιμοποιήσατε αρχικά",
+                "emailSignin": "Δεν ήταν δυνατή η αποστολή του email",
+                "emailVerify": "Παρακαλώ επαληθεύστε τη διεύθυνση ηλεκτρονικού ταχυδρομείου σας, ένα νέο email σας έχει σταλεί",
+                "credentialsSignin": "Η σύνδεση απέτυχε. Ελέγξτε ότι τα στοιχεία που δώσατε είναι σωστά",
+                "sessionRequired": "Παρακαλώ συνδεθείτε για να αποκτήσετε πρόσβαση σε αυτήν τη σελίδα"
             }
         },
         "provider": {
-            "continue": "\u03a3\u03c5\u03bd\u03ad\u03c7\u03b5\u03b9\u03b1 \u03bc\u03b5 {{provider}}"
+            "continue": "Συνέχεια με {{provider}}"
         }
     },
     "chat": {
         "input": {
-            "placeholder": "\u03a0\u03bb\u03b7\u03ba\u03c4\u03c1\u03bf\u03bb\u03bf\u03b3\u03ae\u03c3\u03c4\u03b5 \u03c4\u03bf \u03bc\u03ae\u03bd\u03c5\u03bc\u03ac \u03c3\u03b1\u03c2 \u03b5\u03b4\u03ce...",
+            "placeholder": "Πληκτρολογήστε το μήνυμά σας εδώ...",
             "actions": {
-                "send": "\u0391\u03c0\u03bf\u03c3\u03c4\u03bf\u03bb\u03ae \u03bc\u03b7\u03bd\u03cd\u03bc\u03b1\u03c4\u03bf\u03c2",
-                "stop": "\u0394\u03b9\u03b1\u03ba\u03bf\u03c0\u03ae \u03b5\u03c1\u03b3\u03b1\u03c3\u03af\u03b1\u03c2",
-                "attachFiles": "\u0395\u03c0\u03b9\u03c3\u03cd\u03bd\u03b1\u03c8\u03b7 \u03b1\u03c1\u03c7\u03b5\u03af\u03c9\u03bd"
+                "send": "Αποστολή μηνύματος",
+                "stop": "Διακοπή εργασίας",
+                "attachFiles": "Επισύναψη αρχείων"
             }
         },
         "favorites": {
-            "use": "\u03a7\u03c1\u03b7\u03c3\u03b9\u03bc\u03bf\u03c0\u03bf\u03b9\u03ae\u03c3\u03c4\u03b5 \u03ad\u03bd\u03b1 \u03b1\u03b3\u03b1\u03c0\u03b7\u03bc\u03ad\u03bd\u03bf \u03bc\u03ae\u03bd\u03c5\u03bc\u03b1",
-            "headline": "\u0391\u03b3\u03b1\u03c0\u03b7\u03bc\u03ad\u03bd\u03b1 \u03bc\u03b7\u03bd\u03cd\u03bc\u03b1\u03c4\u03b1",
-            "remove": "\u0391\u03c6\u03b1\u03af\u03c1\u03b5\u03c3\u03b7 \u03b1\u03b3\u03b1\u03c0\u03b7\u03bc\u03ad\u03bd\u03bf\u03c5",
+            "use": "Χρησιμοποιήστε ένα αγαπημένο μήνυμα",
+            "headline": "Αγαπημένα μηνύματα",
+            "remove": "Αφαίρεση αγαπημένου",
             "empty": {
-                "title": "\u0394\u03b5\u03bd \u03c5\u03c0\u03ac\u03c1\u03c7\u03bf\u03c5\u03bd \u03b1\u03c0\u03bf\u03b8\u03b7\u03ba\u03b5\u03c5\u03bc\u03ad\u03bd\u03b5\u03c2 \u03c0\u03c1\u03bf\u03c4\u03c1\u03bf\u03c0\u03ad\u03c2 \u03b1\u03ba\u03cc\u03bc\u03b1",
-                "description": "\u039e\u03b5\u03ba\u03b9\u03bd\u03ae\u03c3\u03c4\u03b5 \u03c3\u03c4\u03ad\u03bb\u03bd\u03bf\u03bd\u03c4\u03b1\u03c2 \u03bc\u03b9\u03b1 \u03c0\u03c1\u03bf\u03c4\u03c1\u03bf\u03c0\u03ae \u03ba\u03b1\u03b9 \u03c0\u03c1\u03bf\u03c3\u03b8\u03ad\u03c3\u03c4\u03b5 \u03c4\u03b7\u03bd \u03c3\u03c4\u03b1 \u03b1\u03b3\u03b1\u03c0\u03b7\u03bc\u03ad\u03bd\u03b1 \u03ae \u03c0\u03c1\u03bf\u03c3\u03b8\u03ad\u03c3\u03c4\u03b5 \u03bc\u03b9\u03b1 \u03c0\u03c1\u03bf\u03c4\u03c1\u03bf\u03c0\u03ae \u03b1\u03c0\u03cc \u03c0\u03c1\u03bf\u03b7\u03b3\u03bf\u03cd\u03bc\u03b5\u03bd\u03b5\u03c2 \u03c3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b5\u03c2"
+                "title": "Δεν υπάρχουν αποθηκευμένες προτροπές ακόμα",
+                "description": "Ξεκινήστε στέλνοντας μια προτροπή και προσθέστε την στα αγαπημένα ή προσθέστε μια προτροπή από προηγούμενες συνομιλίες"
             }
         },
         "commands": {
-            "button": "\u0395\u03c1\u03b3\u03b1\u03bb\u03b5\u03af\u03b1",
-            "changeTool": "\u0391\u03bb\u03bb\u03b1\u03b3\u03ae \u0395\u03c1\u03b3\u03b1\u03bb\u03b5\u03af\u03bf\u03c5",
-            "availableTools": "\u0394\u03b9\u03b1\u03b8\u03ad\u03c3\u03b9\u03bc\u03b1 \u0395\u03c1\u03b3\u03b1\u03bb\u03b5\u03af\u03b1"
+            "button": "Εργαλεία",
+            "changeTool": "Αλλαγή Εργαλείου",
+            "availableTools": "Διαθέσιμα Εργαλεία"
         },
         "speech": {
-            "start": "\u0388\u03bd\u03b1\u03c1\u03be\u03b7 \u03b5\u03b3\u03b3\u03c1\u03b1\u03c6\u03ae\u03c2",
-            "stop": "\u0394\u03b9\u03b1\u03ba\u03bf\u03c0\u03ae \u03b5\u03b3\u03b3\u03c1\u03b1\u03c6\u03ae\u03c2",
-            "connecting": "\u03a3\u03cd\u03bd\u03b4\u03b5\u03c3\u03b7"
+            "start": "Έναρξη εγγραφής",
+            "stop": "Διακοπή εγγραφής",
+            "connecting": "Σύνδεση"
         },
         "fileUpload": {
-            "dragDrop": "\u03a3\u03cd\u03c1\u03b5\u03c4\u03b5 \u03b1\u03c1\u03c7\u03b5\u03af\u03b1 \u03b5\u03b4\u03ce",
-            "browse": "\u0391\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7 \u03b1\u03c1\u03c7\u03b5\u03af\u03c9\u03bd",
-            "sizeLimit": "\u038c\u03c1\u03b9\u03bf:",
+            "dragDrop": "Σύρετε αρχεία εδώ",
+            "browse": "Αναζήτηση αρχείων",
+            "sizeLimit": "Όριο:",
             "errors": {
-                "failed": "\u0397 \u03bc\u03b5\u03c4\u03b1\u03c6\u03cc\u03c1\u03c4\u03c9\u03c3\u03b7 \u03b1\u03c0\u03ad\u03c4\u03c5\u03c7\u03b5",
-                "cancelled": "\u0391\u03ba\u03c5\u03c1\u03ce\u03b8\u03b7\u03ba\u03b5 \u03b7 \u03bc\u03b5\u03c4\u03b1\u03c6\u03cc\u03c1\u03c4\u03c9\u03c3\u03b7 \u03c4\u03bf\u03c5"
+                "failed": "Η μεταφόρτωση απέτυχε",
+                "cancelled": "Ακυρώθηκε η μεταφόρτωση του"
             },
             "actions": {
-                "cancelUpload": "\u0391\u03ba\u03cd\u03c1\u03c9\u03c3\u03b7 \u03bc\u03b5\u03c4\u03b1\u03c6\u03cc\u03c1\u03c4\u03c9\u03c3\u03b7\u03c2",
-                "removeAttachment": "\u0391\u03c6\u03b1\u03af\u03c1\u03b5\u03c3\u03b7 \u03b5\u03c0\u03b9\u03c3\u03cd\u03bd\u03b1\u03c8\u03b7\u03c2"
+                "cancelUpload": "Ακύρωση μεταφόρτωσης",
+                "removeAttachment": "Αφαίρεση επισύναψης"
             }
         },
         "messages": {
@@ -104,156 +104,156 @@
             },
             "actions": {
                 "copy": {
-                    "button": "\u0391\u03bd\u03c4\u03b9\u03b3\u03c1\u03b1\u03c6\u03ae \u03c3\u03c4\u03bf \u03c0\u03c1\u03cc\u03c7\u03b5\u03b9\u03c1\u03bf",
-                    "success": "\u0391\u03bd\u03c4\u03b9\u03b3\u03c1\u03ac\u03c6\u03b7\u03ba\u03b5!"
+                    "button": "Αντιγραφή στο πρόχειρο",
+                    "success": "Αντιγράφηκε!"
                 }
             },
             "feedback": {
-                "positive": "\u03a7\u03c1\u03ae\u03c3\u03b9\u03bc\u03bf\u03c2",
-                "negative": "\u039c\u03b7 \u03c7\u03c1\u03ae\u03c3\u03b9\u03bc\u03bf\u03c2",
-                "edit": "\u0395\u03c0\u03b5\u03be\u03b5\u03c1\u03b3\u03b1\u03c3\u03af\u03b1 \u03c3\u03c7\u03bf\u03bb\u03af\u03c9\u03bd",
+                "positive": "Χρήσιμος",
+                "negative": "Μη χρήσιμος",
+                "edit": "Επεξεργασία σχολίων",
                 "dialog": {
-                    "title": "\u03a0\u03c1\u03bf\u03c3\u03b8\u03ae\u03ba\u03b7 \u03c3\u03c7\u03bf\u03bb\u03af\u03bf\u03c5",
-                    "submit": "\u03a5\u03c0\u03bf\u03b2\u03bf\u03bb\u03ae \u03c3\u03c7\u03bf\u03bb\u03af\u03c9\u03bd",
-                    "yourFeedback": "\u0397 \u03b3\u03bd\u03ce\u03bc\u03b7 \u03c3\u03b1\u03c2"
+                    "title": "Προσθήκη σχολίου",
+                    "submit": "Υποβολή σχολίων",
+                    "yourFeedback": "Η γνώμη σας"
                 },
                 "status": {
-                    "updating": "\u0395\u03bd\u03b7\u03bc\u03b5\u03c1\u03ce\u03bd\u03b5\u03c4\u03b1\u03b9",
-                    "updated": "\u03a4\u03b1 \u03c3\u03c7\u03cc\u03bb\u03b9\u03b1 \u03b5\u03bd\u03b7\u03bc\u03b5\u03c1\u03ce\u03b8\u03b7\u03ba\u03b1\u03bd"
+                    "updating": "Ενημερώνεται",
+                    "updated": "Τα σχόλια ενημερώθηκαν"
                 }
             }
         },
         "history": {
-            "title": "\u03a4\u03b5\u03bb\u03b5\u03c5\u03c4\u03b1\u03af\u03b5\u03c2 \u03b5\u03b9\u03c3\u03b1\u03b3\u03c9\u03b3\u03ad\u03c2",
-            "empty": "\u03a4\u03cc\u03c3\u03bf \u03ac\u03b4\u03b5\u03b9\u03bf...",
-            "show": "\u03a0\u03c1\u03bf\u03b2\u03bf\u03bb\u03ae \u03b9\u03c3\u03c4\u03bf\u03c1\u03b9\u03ba\u03bf\u03cd"
+            "title": "Τελευταίες εισαγωγές",
+            "empty": "Τόσο άδειο...",
+            "show": "Προβολή ιστορικού"
         },
         "settings": {
-            "title": "\u03a0\u03af\u03bd\u03b1\u03ba\u03b1\u03c2 \u03c1\u03c5\u03b8\u03bc\u03af\u03c3\u03b5\u03c9\u03bd",
-            "customize": "\u03a0\u03c1\u03bf\u03c3\u03b1\u03c1\u03bc\u03bf\u03b3\u03ae"
+            "title": "Πίνακας ρυθμίσεων",
+            "customize": "Προσαρμογή"
         },
-        "watermark": "\u03a4\u03b1 \u039c\u0393\u039c \u03bc\u03c0\u03bf\u03c1\u03b5\u03af \u03bd\u03b1 \u03ba\u03ac\u03bd\u03bf\u03c5\u03bd \u03bb\u03ac\u03b8\u03b7. \u0395\u03bb\u03ad\u03b3\u03be\u03c4\u03b5 \u03c3\u03b7\u03bc\u03b1\u03bd\u03c4\u03b9\u03ba\u03ad\u03c2 \u03c0\u03bb\u03b7\u03c1\u03bf\u03c6\u03bf\u03c1\u03af\u03b5\u03c2."
+        "watermark": "Η Αριάδνη χρησιμοποιεί AI και ενδέχεται να παράγει ανακριβείς πληροφορίες. Παρακαλούμε διασταυρώστε τις απαντήσεις με τον επίσημο Οδηγό Σπουδών."
     },
     "threadHistory": {
         "sidebar": {
-            "title": "\u03a0\u03b1\u03bb\u03b1\u03b9\u03cc\u03c4\u03b5\u03c1\u03b5\u03c2 \u03c3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b5\u03c2",
+            "title": "Παλαιότερες συνομιλίες",
             "filters": {
-                "search": "\u0391\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7",
-                "placeholder": "\u0391\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7 \u03c3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03b9\u03ce\u03bd..."
+                "search": "Αναζήτηση",
+                "placeholder": "Αναζήτηση συνομιλιών..."
             },
             "timeframes": {
-                "today": "\u03a3\u03ae\u03bc\u03b5\u03c1\u03b1",
-                "yesterday": "\u03a7\u03b8\u03b5\u03c2",
-                "previous7days": "\u03a0\u03c1\u03bf\u03b7\u03b3\u03bf\u03cd\u03bc\u03b5\u03bd\u03b5\u03c2 7 \u03b7\u03bc\u03ad\u03c1\u03b5\u03c2",
-                "previous30days": "\u03a0\u03c1\u03bf\u03b7\u03b3\u03bf\u03cd\u03bc\u03b5\u03bd\u03b5\u03c2 30 \u03b7\u03bc\u03ad\u03c1\u03b5\u03c2"
+                "today": "Σήμερα",
+                "yesterday": "Χθες",
+                "previous7days": "Προηγούμενες 7 ημέρες",
+                "previous30days": "Προηγούμενες 30 ημέρες"
             },
-            "empty": "\u0394\u03b5\u03bd \u03b2\u03c1\u03ad\u03b8\u03b7\u03ba\u03b1\u03bd \u03bd\u03ae\u03bc\u03b1\u03c4\u03b1",
+            "empty": "Δεν βρέθηκαν νήματα",
             "actions": {
-                "close": "\u039a\u03bb\u03b5\u03af\u03c3\u03b9\u03bc\u03bf \u03c0\u03bb\u03b1\u03ca\u03bd\u03ae\u03c2 \u03b3\u03c1\u03b1\u03bc\u03bc\u03ae\u03c2",
-                "open": "\u0386\u03bd\u03bf\u03b9\u03b3\u03bc\u03b1 \u03c0\u03bb\u03b1\u03ca\u03bd\u03ae\u03c2 \u03b3\u03c1\u03b1\u03bc\u03bc\u03ae\u03c2"
+                "close": "Κλείσιμο πλαϊνής γραμμής",
+                "open": "Άνοιγμα πλαϊνής γραμμής"
             }
         },
         "thread": {
-            "untitled": "\u03a3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1 \u03c7\u03c9\u03c1\u03af\u03c2 \u03c4\u03af\u03c4\u03bb\u03bf",
+            "untitled": "Συνομιλία χωρίς τίτλο",
             "menu": {
-                "rename": "\u039c\u03b5\u03c4\u03bf\u03bd\u03bf\u03bc\u03b1\u03c3\u03af\u03b1",
-                "share": "\u039a\u03bf\u03b9\u03bd\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7",
-                "delete": "\u0394\u03b9\u03b1\u03b3\u03c1\u03b1\u03c6\u03ae"
+                "rename": "Μετονομασία",
+                "share": "Κοινοποίηση",
+                "delete": "Διαγραφή"
             },
             "actions": {
                 "share": {
-                    "title": "\u039a\u03bf\u03b9\u03bd\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7 \u03c3\u03c5\u03bd\u03b4\u03ad\u03c3\u03bc\u03bf\u03c5 \u03c3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1\u03c2",
-                    "button": "\u039a\u03bf\u03b9\u03bd\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7",
+                    "title": "Κοινοποίηση συνδέσμου συνομιλίας",
+                    "button": "Κοινοποίηση",
                     "status": {
-                        "copied": "\u039f \u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03bc\u03bf\u03c2 \u03b1\u03bd\u03c4\u03b9\u03b3\u03c1\u03ac\u03c6\u03b7\u03ba\u03b5",
-                        "created": "\u039f \u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03bc\u03bf\u03c2 \u03ba\u03bf\u03b9\u03bd\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7\u03c2 \u03b4\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03ae\u03b8\u03b7\u03ba\u03b5!",
-                        "unshared": "\u0397 \u03ba\u03bf\u03b9\u03bd\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7 \u03b1\u03c0\u03b5\u03bd\u03b5\u03c1\u03b3\u03bf\u03c0\u03bf\u03b9\u03ae\u03b8\u03b7\u03ba\u03b5 \u03b3\u03b9\u03b1 \u03b1\u03c5\u03c4\u03cc \u03c4\u03bf \u03bd\u03ae\u03bc\u03b1"
+                        "copied": "Ο σύνδεσμος αντιγράφηκε",
+                        "created": "Ο σύνδεσμος κοινοποίησης δημιουργήθηκε!",
+                        "unshared": "Η κοινοποίηση απενεργοποιήθηκε για αυτό το νήμα"
                     },
                     "error": {
-                        "create": "\u0391\u03c0\u03bf\u03c4\u03c5\u03c7\u03af\u03b1 \u03b4\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03af\u03b1\u03c2 \u03c3\u03c5\u03bd\u03b4\u03ad\u03c3\u03bc\u03bf\u03c5 \u03ba\u03bf\u03b9\u03bd\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7\u03c2",
-                        "unshare": "\u0391\u03c0\u03bf\u03c4\u03c5\u03c7\u03af\u03b1 \u03b4\u03b9\u03b1\u03ba\u03bf\u03c0\u03ae\u03c2 \u03ba\u03bf\u03b9\u03bd\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7\u03c2 \u03bd\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2"
+                        "create": "Αποτυχία δημιουργίας συνδέσμου κοινοποίησης",
+                        "unshare": "Αποτυχία διακοπής κοινοποίησης νήματος"
                     }
                 },
                 "delete": {
-                    "title": "\u0395\u03c0\u03b9\u03b2\u03b5\u03b2\u03b1\u03af\u03c9\u03c3\u03b7 \u03b4\u03b9\u03b1\u03b3\u03c1\u03b1\u03c6\u03ae\u03c2",
-                    "description": "\u0391\u03c5\u03c4\u03cc \u03b8\u03b1 \u03b4\u03b9\u03b1\u03b3\u03c1\u03ac\u03c8\u03b5\u03b9 \u03c4\u03bf \u03bd\u03ae\u03bc\u03b1 \u03ba\u03b1\u03b8\u03ce\u03c2 \u03ba\u03b1\u03b9 \u03c4\u03b1 \u03bc\u03b7\u03bd\u03cd\u03bc\u03b1\u03c4\u03b1 \u03ba\u03b1\u03b9 \u03c4\u03b1 \u03c3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03c4\u03bf\u03c5. \u0391\u03c5\u03c4\u03ae \u03b7 \u03b5\u03bd\u03ad\u03c1\u03b3\u03b5\u03b9\u03b1 \u03b4\u03b5\u03bd \u03bc\u03c0\u03bf\u03c1\u03b5\u03af \u03bd\u03b1 \u03b1\u03bd\u03b1\u03b9\u03c1\u03b5\u03b8\u03b5\u03af.",
-                    "success": "\u0397 \u03c3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1 \u03b4\u03b9\u03b1\u03b3\u03c1\u03ac\u03c6\u03b7\u03ba\u03b5",
-                    "inProgress": "\u0394\u03b9\u03b1\u03b3\u03c1\u03b1\u03c6\u03ae \u03c3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1\u03c2"
+                    "title": "Επιβεβαίωση διαγραφής",
+                    "description": "Αυτό θα διαγράψει το νήμα καθώς και τα μηνύματα και τα στοιχεία του. Αυτή η ενέργεια δεν μπορεί να αναιρεθεί.",
+                    "success": "Η συνομιλία διαγράφηκε",
+                    "inProgress": "Διαγραφή συνομιλίας"
                 },
                 "rename": {
-                    "title": "\u039c\u03b5\u03c4\u03bf\u03bd\u03bf\u03bc\u03b1\u03c3\u03af\u03b1 \u039d\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2",
-                    "description": "\u0395\u03b9\u03c3\u03b1\u03b3\u03ac\u03b3\u03b5\u03c4\u03b5 \u03ad\u03bd\u03b1 \u03bd\u03ad\u03bf \u03cc\u03bd\u03bf\u03bc\u03b1 \u03b3\u03b9\u03b1 \u03b1\u03c5\u03c4\u03cc \u03c4\u03bf \u03bd\u03ae\u03bc\u03b1",
+                    "title": "Μετονομασία Νήματος",
+                    "description": "Εισαγάγετε ένα νέο όνομα για αυτό το νήμα",
                     "form": {
                         "name": {
-                            "label": "\u038c\u03bd\u03bf\u03bc\u03b1",
-                            "placeholder": "\u0395\u03b9\u03c3\u03b1\u03b3\u03ac\u03b3\u03b5\u03c4\u03b5 \u03bd\u03ad\u03bf \u03cc\u03bd\u03bf\u03bc\u03b1"
+                            "label": "Όνομα",
+                            "placeholder": "Εισαγάγετε νέο όνομα"
                         }
                     },
-                    "success": "\u03a4\u03bf \u03bd\u03ae\u03bc\u03b1 \u03bc\u03b5\u03c4\u03bf\u03bd\u03bf\u03bc\u03ac\u03c3\u03c4\u03b7\u03ba\u03b5!",
-                    "inProgress": "\u039c\u03b5\u03c4\u03bf\u03bd\u03bf\u03bc\u03b1\u03c3\u03af\u03b1 \u039d\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2"
+                    "success": "Το νήμα μετονομάστηκε!",
+                    "inProgress": "Μετονομασία Νήματος"
                 }
             }
         }
     },
     "navigation": {
         "header": {
-            "chat": "\u03a3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1",
-            "readme": "\u0394\u03b9\u03ac\u03b2\u03b1\u03c3\u03ad \u03bc\u03b5",
+            "chat": "Συνομιλία",
+            "readme": "Διάβασέ με",
             "theme": {
-                "light": "\u03a6\u03c9\u03c4\u03b5\u03b9\u03bd\u03cc \u0398\u03ad\u03bc\u03b1",
-                "dark": "\u03a3\u03ba\u03bf\u03c4\u03b5\u03b9\u03bd\u03cc \u03b8\u03ad\u03bc\u03b1",
-                "system": "\u0391\u03ba\u03bf\u03bb\u03bf\u03c5\u03b8\u03ae\u03c3\u03c4\u03b5 \u03c4\u03bf \u03c3\u03cd\u03c3\u03c4\u03b7\u03bc\u03b1"
+                "light": "Φωτεινό Θέμα",
+                "dark": "Σκοτεινό θέμα",
+                "system": "Ακολουθήστε το σύστημα"
             }
         },
         "newChat": {
-            "button": "\u039d\u03ad\u03b1 \u03a3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1",
+            "button": "Νέα Συνομιλία",
             "dialog": {
-                "title": "\u0394\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03af\u03b1 \u039d\u03ad\u03b1\u03c2 \u03a3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1\u03c2",
-                "description": "\u0391\u03c5\u03c4\u03cc \u03b8\u03b1 \u03b4\u03b9\u03b1\u03b3\u03c1\u03ac\u03c8\u03b5\u03b9 \u03c4\u03bf \u03c4\u03c1\u03ad\u03c7\u03bf\u03bd \u03b9\u03c3\u03c4\u03bf\u03c1\u03b9\u03ba\u03cc \u03c3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1\u03c2 \u03c3\u03b1\u03c2. \u0395\u03af\u03c3\u03c4\u03b5 \u03b2\u03ad\u03b2\u03b1\u03b9\u03bf\u03b9 \u03cc\u03c4\u03b9 \u03b8\u03ad\u03bb\u03b5\u03c4\u03b5 \u03bd\u03b1 \u03c3\u03c5\u03bd\u03b5\u03c7\u03af\u03c3\u03b5\u03c4\u03b5;",
-                "tooltip": "\u039d\u03ad\u03b1 \u03a3\u03c5\u03bd\u03bf\u03bc\u03b9\u03bb\u03af\u03b1"
+                "title": "Δημιουργία Νέας Συνομιλίας",
+                "description": "Αυτό θα διαγράψει το τρέχον ιστορικό συνομιλίας σας. Είστε βέβαιοι ότι θέλετε να συνεχίσετε;",
+                "tooltip": "Νέα Συνομιλία"
             }
         },
         "user": {
             "menu": {
-                "settings": "\u03a1\u03c5\u03b8\u03bc\u03af\u03c3\u03b5\u03b9\u03c2",
+                "settings": "Ρυθμίσεις",
                 "settingsKey": "S",
-                "apiKeys": "\u039a\u03bb\u03b5\u03b9\u03b4\u03b9\u03ac API",
-                "logout": "\u0391\u03c0\u03bf\u03c3\u03cd\u03bd\u03b4\u03b5\u03c3\u03b7"
+                "apiKeys": "Κλειδιά API",
+                "logout": "Αποσύνδεση"
             }
         }
     },
     "apiKeys": {
-        "title": "\u0391\u03c0\u03b1\u03b9\u03c4\u03bf\u03cd\u03bc\u03b5\u03bd\u03b1 \u03ba\u03bb\u03b5\u03b9\u03b4\u03b9\u03ac API",
-        "description": "\u0393\u03b9\u03b1 \u03bd\u03b1 \u03c7\u03c1\u03b7\u03c3\u03b9\u03bc\u03bf\u03c0\u03bf\u03b9\u03ae\u03c3\u03b5\u03c4\u03b5 \u03b1\u03c5\u03c4\u03ae\u03bd \u03c4\u03b7\u03bd \u03b5\u03c6\u03b1\u03c1\u03bc\u03bf\u03b3\u03ae, \u03b1\u03c0\u03b1\u03b9\u03c4\u03bf\u03cd\u03bd\u03c4\u03b1\u03b9 \u03c4\u03b1 \u03b1\u03ba\u03cc\u03bb\u03bf\u03c5\u03b8\u03b1 \u03ba\u03bb\u03b5\u03b9\u03b4\u03b9\u03ac API. \u03a4\u03b1 \u03ba\u03bb\u03b5\u03b9\u03b4\u03b9\u03ac \u03b5\u03af\u03bd\u03b1\u03b9 \u03b1\u03c0\u03bf\u03b8\u03b7\u03ba\u03b5\u03c5\u03bc\u03ad\u03bd\u03b1 \u03c3\u03c4\u03bf\u03bd \u03c4\u03bf\u03c0\u03b9\u03ba\u03cc \u03c7\u03ce\u03c1\u03bf \u03b1\u03c0\u03bf\u03b8\u03ae\u03ba\u03b5\u03c5\u03c3\u03b7\u03c2 \u03c4\u03b7\u03c2 \u03c3\u03c5\u03c3\u03ba\u03b5\u03c5\u03ae\u03c2 \u03c3\u03b1\u03c2.",
+        "title": "Απαιτούμενα κλειδιά API",
+        "description": "Για να χρησιμοποιήσετε αυτήν την εφαρμογή, απαιτούνται τα ακόλουθα κλειδιά API. Τα κλειδιά είναι αποθηκευμένα στον τοπικό χώρο αποθήκευσης της συσκευής σας.",
         "success": {
-            "saved": "\u0391\u03c0\u03bf\u03b8\u03b7\u03ba\u03b5\u03cd\u03c4\u03b7\u03ba\u03b5 \u03bc\u03b5 \u03b5\u03c0\u03b9\u03c4\u03c5\u03c7\u03af\u03b1"
+            "saved": "Αποθηκεύτηκε με επιτυχία"
         }
     },
     "alerts": {
-        "info": "\u03a0\u03bb\u03b7\u03c1\u03bf\u03c6\u03bf\u03c1\u03af\u03b5\u03c2",
-        "note": "\u03a3\u03b7\u03bc\u03b5\u03af\u03c9\u03c3\u03b7",
-        "tip": "\u03a3\u03c5\u03bc\u03b2\u03bf\u03c5\u03bb\u03ae",
-        "important": "\u03a3\u03b7\u03bc\u03b1\u03bd\u03c4\u03b9\u03ba\u03cc",
-        "warning": "\u03a0\u03c1\u03bf\u03b5\u03b9\u03b4\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7",
-        "caution": "\u03a0\u03c1\u03bf\u03c3\u03bf\u03c7\u03ae",
-        "debug": "\u0395\u03bd\u03c4\u03bf\u03c0\u03b9\u03c3\u03bc\u03cc\u03c2 \u03c3\u03c6\u03b1\u03bb\u03bc\u03ac\u03c4\u03c9\u03bd",
-        "example": "\u03a0\u03b1\u03c1\u03ac\u03b4\u03b5\u03b9\u03b3\u03bc\u03b1",
-        "success": "\u0395\u03c0\u03b9\u03c4\u03c5\u03c7\u03af\u03b1",
-        "help": "\u0392\u03bf\u03ae\u03b8\u03b5\u03b9\u03b1",
-        "idea": "\u0399\u03b4\u03ad\u03b1",
-        "pending": "\u03a3\u03b5 \u03b5\u03ba\u03ba\u03c1\u03b5\u03bc\u03cc\u03c4\u03b7\u03c4\u03b1",
-        "security": "\u0391\u03c3\u03c6\u03ac\u03bb\u03b5\u03b9\u03b1",
+        "info": "Πληροφορίες",
+        "note": "Σημείωση",
+        "tip": "Συμβουλή",
+        "important": "Σημαντικό",
+        "warning": "Προειδοποίηση",
+        "caution": "Προσοχή",
+        "debug": "Εντοπισμός σφαλμάτων",
+        "example": "Παράδειγμα",
+        "success": "Επιτυχία",
+        "help": "Βοήθεια",
+        "idea": "Ιδέα",
+        "pending": "Σε εκκρεμότητα",
+        "security": "Ασφάλεια",
         "beta": "Beta",
-        "best-practice": "\u0392\u03ad\u03bb\u03c4\u03b9\u03c3\u03c4\u03b7 \u03a0\u03c1\u03b1\u03ba\u03c4\u03b9\u03ba\u03ae"
+        "best-practice": "Βέλτιστη Πρακτική"
     },
     "components": {
         "MultiSelectInput": {
-            "placeholder": "\u0395\u03c0\u03b9\u03bb\u03ad\u03be\u03c4\u03b5..."
+            "placeholder": "Επιλέξτε..."
         },
         "DatePickerInput": {
             "placeholder": {
-                "single": "\u0395\u03c0\u03b9\u03bb\u03ad\u03be\u03c4\u03b5 \u03b7\u03bc\u03b5\u03c1\u03bf\u03bc\u03b7\u03bd\u03af\u03b1",
-                "range": "\u0395\u03c0\u03b9\u03bb\u03ad\u03be\u03c4\u03b5 \u03b5\u03cd\u03c1\u03bf\u03c2 \u03b7\u03bc\u03b5\u03c1\u03bf\u03bc\u03b7\u03bd\u03b9\u03ce\u03bd"
+                "single": "Επιλέξτε ημερομηνία",
+                "range": "Επιλέξτε εύρος ημερομηνιών"
             }
         }
     }
