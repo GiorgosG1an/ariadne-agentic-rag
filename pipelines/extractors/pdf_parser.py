@@ -9,10 +9,12 @@ from typing import List, Tuple, Dict, Optional, Union
 
 import pymupdf
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from pipelines.core.logger import get_logger
+
+logger = get_logger(__name__)
 
 class TableType(Enum):
     COURSES = "COURSES"

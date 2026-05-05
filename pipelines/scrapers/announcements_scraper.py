@@ -1,63 +1,58 @@
 import asyncio
 import json
+import sys
+import os
 from datetime import datetime
 from pathlib import Path
-from typing import Set
+from typing import Set, List
 from urllib.parse import urljoin
 
 import aiohttp
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from markdownify import ATX, markdownify as md
+from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
+from fake_useragent import UserAgent
 
-# ==========================================
-# Settings & URLS
-# ==========================================
-BASE_URL = "https://dit.uop.gr/"
-OUTPUT_DIR = Path("website_data")
-OUTPUT_FILE = OUTPUT_DIR / "dit_announcements.jsonl"
-CONCURRENT_REQUESTS = 5
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-OUTPUT_DIR.mkdir(exist_ok=True)
+from pipelines.core.logger import get_logger
+from pipelines.schemas.documents import AnnouncementModel
 
-ANNOUNCEMENT_URLS = [
-    "https://dit.uop.gr/all-announcements",
-]
+logger = get_logger(__name__)
 
-months_ago = datetime.now() - relativedelta(months=2)
-FROM_DATE = months_ago.strftime("%Y-%m-%d")
+class AnnouncementScraper:
+    def __init__(self, base_url: str = "https://dit.uop.gr/", output_dir: str = "data/website_data"):
+        self.base_url = base_url
+        self.output_dir = Path(output_dir)
+        self.output_file = self.output_dir / "dit_announcements.jsonl"
+        self.concurrent_requests = 5
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.announcement_urls = ["https://dit.uop.gr/all-announcements"]
+        self.from_date = (datetime.now() - relativedelta(months=2)).strftime("%Y-%m-%d")
+        self.ua = UserAgent()
 
+    def get_headers(self):
+        return {"User-Agent": self.ua.random}
 
-async def discover_announcement_links(
-    session: aiohttp.ClientSession, base_list_url: str
-) -> Set[str]:
-    """Discover announcement links from the base list URL by applying the 'from' date filter.
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10), retry=retry_if_exception_type(aiohttp.ClientError))
+    async def fetch_page(self, session: aiohttp.ClientSession, url: str) -> str:
+        async with session.get(url, timeout=15, headers=self.get_headers()) as response:
+            response.raise_for_status()
+            return await response.text()
 
-    This function iterates through paginated pages of the announcement list,
-    starting from the specified FROM_DATE, and collects unique URLs of announcements.
+    async def discover_announcement_links(self, session: aiohttp.ClientSession, base_list_url: str) -> Set[str]:
+        found_links = set()
+        page = 0
+        logger.info(f"Looking announcements from: {self.from_date} to: {base_list_url}")
 
-    Returns:
-        Set: A set of unique full URLs to individual announcements.
-    """
-    found_links = set()
-    page = 0
+        IGNORE_PATHS = ["/en", "/user", "/taxonomy", "/rss", "/search"]
 
-    print(f"\nLooking announcments from: {FROM_DATE} to: {base_list_url}")
-
-    # list of paths to ignore
-    IGNORE_PATHS = ["/en", "/user", "/taxonomy", "/rss", "/search"]
-
-    while True:
-        url = f"{base_list_url}?from={FROM_DATE}&page={page}"
-
-        try:
-            async with session.get(url, timeout=10) as response:
-                if response.status != 200:
-                    break
-
-                html = await response.text()
+        while True:
+            url = f"{base_list_url}?from={self.from_date}&page={page}"
+            try:
+                html = await self.fetch_page(session, url)
                 soup = BeautifulSoup(html, "html.parser")
-
                 main_content = soup.find("main", role="main")
                 if not main_content:
                     break
@@ -66,56 +61,37 @@ async def discover_announcement_links(
 
                 for a_tag in main_content.find_all("a", href=True):
                     href = a_tag["href"]
-
-                    # Ignore pagination, anchors και filters
                     if "?page=" in href or "?from=" in href or href.startswith("#"):
                         continue
-
-                    # Ignore (href="/") and known paths that dont include announcments
-                    if href == "/" or any(
-                        href.startswith(path) for path in IGNORE_PATHS
-                    ):
+                    if href == "/" or any(href.startswith(path) for path in IGNORE_PATHS):
                         continue
-
-                    if href.startswith("/") and not href.endswith(
-                        (".pdf", ".zip", ".jpg", ".png", ".doc", ".docx")
-                    ):
-                        full_url = urljoin(BASE_URL, href)
-                        if full_url not in ANNOUNCEMENT_URLS:
+                    if href.startswith("/") and not href.endswith((".pdf", ".zip", ".jpg", ".png", ".doc", ".docx")):
+                        full_url = urljoin(self.base_url, href)
+                        if full_url not in self.announcement_urls:
                             found_links.add(full_url)
 
                 if len(found_links) == previous_link_count:
-                    print(f"   [End of list at page {page}]")
+                    logger.info(f"[End of list at page {page}]")
                     break
 
                 page += 1
                 await asyncio.sleep(0.5)
+            except Exception as e:
+                logger.error(f"Error occurred at page {page}: {e}")
+                break
 
-        except Exception as e:
-            print(f"Error occured {page}: {e}")
-            break
+        logger.info(f"Found {len(found_links)} unique announcements (until {self.from_date}).")
+        return found_links
 
-    print(f"Found {len(found_links)} unique announcments (until {FROM_DATE}).")
-    return found_links
-
-
-async def fetch_and_parse_announcement(
-    url: str, session: aiohttp.ClientSession, semaphore: asyncio.Semaphore
-):
-    async with semaphore:
-        try:
-            async with session.get(url, timeout=15) as response:
-                if response.status != 200:
-                    return None
-
-                html = await response.text()
+    async def fetch_and_parse_announcement(self, url: str, session: aiohttp.ClientSession, semaphore: asyncio.Semaphore) -> AnnouncementModel | None:
+        async with semaphore:
+            try:
+                html = await self.fetch_page(session, url)
                 soup = BeautifulSoup(html, "html.parser")
-
                 main_content = soup.find("main", role="main")
                 if not main_content:
                     return None
 
-                # PDF Links
                 for a_tag in main_content.find_all("a", href=True):
                     href = a_tag["href"]
                     if href.lower().endswith(".pdf"):
@@ -124,11 +100,8 @@ async def fetch_and_parse_announcement(
                     else:
                         a_tag["href"] = urljoin(url, href)
 
-                # remove unwanted tags
                 cruft_tags = (
-                    main_content.find_all(
-                        class_=["breadcrumb", "tabs", "action-links", "pager"]
-                    )
+                    main_content.find_all(class_=["breadcrumb", "tabs", "action-links", "pager"])
                     + main_content.find_all(class_="region region-sidebar-second")
                     + main_content.find_all("nav")
                     + main_content.find_all(attrs={"role": "navigation"})
@@ -138,13 +111,8 @@ async def fetch_and_parse_announcement(
                     tag.decompose()
 
                 title_tag = soup.find("h1", class_="page-header") or soup.find("title")
-                title = (
-                    title_tag.get_text(strip=True).split(" |")[0]
-                    if title_tag
-                    else "Ανακοίνωση χωρίς τίτλο"
-                )
+                title = title_tag.get_text(strip=True).split(" |")[0] if title_tag else "Ανακοίνωση χωρίς τίτλο"
 
-                # date
                 date_tag = soup.find("time")
                 if date_tag and date_tag.has_attr("datetime"):
                     post_date = date_tag["datetime"].split("T")[0]
@@ -152,65 +120,55 @@ async def fetch_and_parse_announcement(
                     post_date = datetime.now().strftime("%Y-%m-%d")
 
                 markdown_text = md(str(main_content), heading_style=ATX)
-
                 cleaned_lines = [line.strip() for line in markdown_text.split("\n")]
                 cleaned_text = "\n".join(line for line in cleaned_lines if line)
 
                 if len(cleaned_text) < 30:
                     return None
 
-                final_text = (
-                    f"ΑΝΑΚΟΙΝΩΣΗ: {title}\nΗΜΕΡΟΜΗΝΙΑ: {post_date}\n\n{cleaned_text}"
+                final_text = f"ΑΝΑΚΟΙΝΩΣΗ: {title}\nΗΜΕΡΟΜΗΝΙΑ: {post_date}\n\n{cleaned_text}"
+
+                # Pydantic validation
+                announcement = AnnouncementModel(
+                    url=url,
+                    title=title,
+                    last_modified=post_date,
+                    cleaned_content=final_text
                 )
+                return announcement
+            except Exception as e:
+                logger.error(f"Error fetching {url}: {e}")
+                return None
 
-                return {
-                    "url": url,
-                    "title": title,
-                    "content_category": "Ανακοινώσεις",
-                    "last_modified": post_date,
-                    "cleaned_content": final_text,
-                }
+    async def run(self):
+        with open(self.output_file, "w", encoding="utf-8") as f:
+            pass
 
-        except Exception as e:
-            print(f"Σφάλμα στο {url}: {e}")
-            return None
+        async with aiohttp.ClientSession() as session:
+            all_announcement_links = set()
+            for list_url in self.announcement_urls:
+                links = await self.discover_announcement_links(session, list_url)
+                all_announcement_links.update(links)
 
+            if not all_announcement_links:
+                logger.info("No recent announcements found.")
+                return
 
-async def main():
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        pass
+            semaphore = asyncio.Semaphore(self.concurrent_requests)
+            tasks = [self.fetch_and_parse_announcement(url, session, semaphore) for url in all_announcement_links]
 
-    async with aiohttp.ClientSession() as session:
-        all_announcement_links = set()
+            logger.info(f"Starting scraping for {len(tasks)} announcements...")
+            results = await asyncio.gather(*tasks)
 
-        for list_url in ANNOUNCEMENT_URLS:
-            links = await discover_announcement_links(session, list_url)
-            all_announcement_links.update(links)
+            valid_results = 0
+            with open(self.output_file, "a", encoding="utf-8") as f:
+                for res in results:
+                    if res:
+                        f.write(res.model_dump_json() + "\n")
+                        valid_results += 1
 
-        if not all_announcement_links:
-            print("Δεν βρέθηκαν πρόσφατες ανακοινώσεις.")
-            return
-
-        semaphore = asyncio.Semaphore(CONCURRENT_REQUESTS)
-        tasks = [
-            fetch_and_parse_announcement(url, session, semaphore)
-            for url in all_announcement_links
-        ]
-
-        print(f"\nΞεκινάει η λήψη κειμένου για {len(tasks)} ανακοινώσεις...")
-        results = await asyncio.gather(*tasks)
-
-        valid_results = 0
-        with open(OUTPUT_FILE, "a", encoding="utf-8") as f:
-            for res in results:
-                if res:
-                    f.write(json.dumps(res, ensure_ascii=False) + "\n")
-                    valid_results += 1
-
-        print(
-            f"\nΟλοκληρώθηκε! Αποθηκεύτηκαν {valid_results} ΠΡΟΣΦΑΤΕΣ ανακοινώσεις στο {OUTPUT_FILE}"
-        )
-
+            logger.info(f"Completed! Saved {valid_results} announcements to {self.output_file}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    scraper = AnnouncementScraper()
+    asyncio.run(scraper.run())
